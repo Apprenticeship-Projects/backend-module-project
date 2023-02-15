@@ -11,4 +11,4 @@ async function connect() {
     }
 }
 
-(async () => await connect())();
+await connect();
