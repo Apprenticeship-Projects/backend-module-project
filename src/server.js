@@ -4,7 +4,7 @@ dotenv.config();
 
 async function connect() {
     try {
-        mongoose.set('strictQuery', false);
+        mongoose.set('strictQuery', false); // The default in Mongoose 7
         await mongoose.connect(process.env.CONNECTION_STRING);
         console.log("CONNECTED");
     } catch (error) {
