@@ -16,3 +16,15 @@ Start the database service:
 ```zsh
 brew services start mongodb-community
 ```
+
+Enter the mongodb shell:
+
+```zsh
+mongosh
+```
+
+Create the database:
+
+```zsh
+use backend-module-project
+```
