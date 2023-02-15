@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "type": "module",
-  "module": "module",
   "scripts": {
     "test": "jest",
     "start": "node src/server.js",
