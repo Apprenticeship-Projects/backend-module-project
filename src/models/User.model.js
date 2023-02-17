@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import validator_pkg from "validator";
 
 const schema = new mongoose.Schema(
 	{
@@ -16,12 +17,19 @@ const schema = new mongoose.Schema(
 			minLength: 5,
 			required: true,
 			unique: true,
+			validate: {
+				validator: (email) => {
+					return validator_pkg.isEmail(email);
+				},
+				message: (props) => `${props.value} is not a valid email!`,
+			},
 		},
 		firstName: {
 			type: String,
 			trim: true,
 			minLength: 1,
 			required: true,
+			alias: "name",
 		},
 		lastName: {
 			type: String,
@@ -60,6 +68,7 @@ const schema = new mongoose.Schema(
 				message: (props) =>
 					`DoB (${props.value}) is less than 13 years.`,
 			},
+			alias: "dateofbirth",
 		},
 		ratings: {
 			type: [
