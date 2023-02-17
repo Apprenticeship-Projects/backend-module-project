@@ -1,7 +1,5 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-dotenv.config();
 import users from "./users.json" assert { type: "json" };
 import tunes from "./tunes.json" assert { type: "json" };
 import { User, Tune } from "../models/index.js";

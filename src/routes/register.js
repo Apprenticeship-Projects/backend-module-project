@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, validationResult } from "express-validator.js";
+import { body, validationResult } from "express-validator";
 import { checkErrors } from "../utils/validationMiddleware.js";
 import User from "../models/User.model.js";
 import { createHash } from "../utils/hash.js";

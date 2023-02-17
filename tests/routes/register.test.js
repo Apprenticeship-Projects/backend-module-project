@@ -1,8 +1,5 @@
-import dotenv from "dotenv";
-dotenv.config();
 import {app} from "../../src/app.js";
 import request from "supertest";
-import mongoose, { connect } from 'mongoose';
 
 // beforeAll(async () => {
 //     // app.listen(process.env.PORT, async() => {
