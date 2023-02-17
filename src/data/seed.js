@@ -1,3 +1,3 @@
-import seed from "./seedFn";
+import seed from "./seedFn.js";
 
 seed();
