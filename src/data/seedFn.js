@@ -8,19 +8,19 @@ import { User, Tune } from "../models/index.js";
 
 const SALT_ROUNDS = 10;
 
-export default async function seed() {
-	mongoose.set("strictQuery", false); // The default in Mongoose 7
-	await mongoose.connect(process.env.CONNECTION_STRING);
+export default async function seed(close = true) {
+  mongoose.set("strictQuery", false); // The default in Mongoose 7
+  await mongoose.connect(process.env.CONNECTION_STRING);
 
-	await User.deleteMany({});
-	await Tune.deleteMany({});
+  await User.deleteMany({});
+  await Tune.deleteMany({});
 
-	for (let user of users) {
-		user.password = await bcrypt.hash(user.password, SALT_ROUNDS);
-	}
+  for (let user of users) {
+    user.password = await bcrypt.hash(user.password, SALT_ROUNDS);
+  }
 
-	await User.insertMany(users);
-	await Tune.insertMany(tunes);
+  await User.insertMany(users);
+  await Tune.insertMany(tunes);
 
-	await mongoose.disconnect();
+  if (close) await mongoose.disconnect();
 }
