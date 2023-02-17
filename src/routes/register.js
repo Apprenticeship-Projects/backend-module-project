@@ -11,7 +11,7 @@ const SALT_ROUNDS = 10;
 //Register user
 router.post("/", 
   body('email').notEmpty().isEmail(),
-  body('password').notEmpty(),
+  body('password').notEmpty().isLength({min: 8, max: 20}),
   body('username').notEmpty(),
   body('firstName').notEmpty(),
   body('lastName').notEmpty(),
