@@ -3,6 +3,7 @@ dotenv.config();
 import mongoose from 'mongoose';
 import express from 'express';
 import cors from 'cors';
+import {userRouter, tuneRouter, sessionRouter} from './routes/';
 
 const app = express(); //create a new instance of express
 app.use(express.urlencoded({ extended: false }));
