@@ -1,0 +1,26 @@
+[
+    {
+        "title": "Announcement",
+        "genre": "NONE",
+        "tempo": "4n",
+        "tracks": [
+            {
+                "type": "SYNTH",
+                "notes": [
+                    [
+                        "C4",
+                        "8n"
+                    ],
+                    [
+                        "E4",
+                        "8n"
+                    ],
+                    [
+                        "G4",
+                        "8n"
+                    ]
+                ]
+            }
+        ]
+    }
+]

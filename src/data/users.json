@@ -1,0 +1,34 @@
+[
+    {
+        "username": "Batman",
+        "email": "thebat@gmail.com",
+        "firstName": "REDACTED",
+        "lastName": "REDACTED",
+        "password": "bRuceWAyne15thEbeST!",
+        "dob": "1915/4/7"
+    },
+    {
+        "username": "superman_no1",
+        "email": "superman@justice.com",
+        "firstName": "Clark",
+        "lastName": "Kent",
+        "password": "lois.lane!HearT",
+        "dob": "1938/4/18"
+    },
+    {
+        "username": "theFlash1",
+        "email": "flash@email.com",
+        "firstName": "Henry",
+        "lastName": "Allen",
+        "password": "flash123!",
+        "dob": "1992/9/30"
+    },
+    {
+        "username": "jokehahaha",
+        "email": "joker@laugh.com",
+        "firstName": "Jack",
+        "lastName": "Napier",
+        "password": "laughingfish",
+        "dob": "1946/11/21"
+    }
+]
