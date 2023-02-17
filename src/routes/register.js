@@ -3,6 +3,7 @@ import { body, validationResult } from "express-validator";
 import { checkErrors } from "../utils/validationMiddleware";
 import User from "../models/User.model.js";
 import { createHash } from "../utils/hash";
+import bcrypt from 'bcrypt';
 
 const router = Router();
 

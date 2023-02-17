@@ -1,10 +1,17 @@
+import dotenv from "dotenv";
+dotenv.config();
 import {app} from "../src/app.js";
 import request from "supertest";
+import mongoose from 'mongoose';
 
 beforeAll(async () => {
-    // Here we will seed the DB
-    // And do any other set up requireds for testing
-    // await seed();
+    app.listen(process.env.PORT, async() => {
+        await connect();
+    });
+})
+
+afterAll(async () => {
+    // app.close();
 })
 
 describe("Register a user", () => {
