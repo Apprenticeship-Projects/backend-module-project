@@ -1,13 +1,13 @@
 import request from "supertest";
 import { app } from "../../src/app.js";
-import seed from "../src/data/seedFn.js";
+import seed from "../../src/data/seedFn.js";
 
 let testUserObject;
 const token = "sign token myself"; // sign with my secret for testing
 const wrongToken = "sign token for wrong user myself"; // sign with my secret for testing
 
 beforeEach(() => {
-  seed();
+  seed(false);
   testUserObject = {
     username: "theFlash1",
     email: "flash@email.com",
