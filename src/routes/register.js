@@ -1,22 +1,45 @@
 import { Router } from "express";
 import {body, validationResult} from 'express-validator';
 import { checkErrors } from "../utils/validationMiddleware";
+import User from "../models/User.model.js";
+import { createHash } from "../utils/hash";
 
 const router = Router();
-
-// {  email:"teddyputus1@gmail.com", password:"thisisapassword", username:"Tedernator", firstName:"Teddy", lastName:"Putus", dob: "21/12/1992"}
+const SALT_ROUNDS = 10;
 // Routes for /register
 
+//Register user
 router.post("/", 
-body('email').notEmpty(),
-body('password').notEmpty(),
-body('username').notEmpty(),
-body('firstName').notEmpty(),
-body('lastName').notEmpty(),
-body('dob').notEmpty(),
-checkErrors,
-(req, res) => {
-  res.status(200).send("/register POST route");
+  body('email').notEmpty().isEmail(),
+  body('password').notEmpty(),
+  body('username').notEmpty(),
+  body('firstName').notEmpty(),
+  body('lastName').notEmpty(),
+  body('dob').notEmpty(),
+  checkErrors,
+  async (req, res) => {
+    try {
+      const hashedPass = await createHash(req.body.password);
+
+      const createdUser = new User({
+        username: req.body.username,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        password: hashedPass,
+        email: req.body.email,
+        dob: Date.parse(req.body.dob)
+      });
+
+      console.log(createdUser)
+
+      await createdUser.save();
+
+      res.status(200).send("registered");
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error);
+    }
+    
 });
 
 export { router };
