@@ -7,7 +7,10 @@ export async function connect() {
 
 	try {
 		mongoose.set("strictQuery", false); // The default in Mongoose 7
-		await mongoose.connect(process.env.CONNECTION_STRING);
+		await mongoose.connect(process.env.CONNECTION_STRING, {
+			useNewUrlParser: true,
+			useUnifiedTopology: true,
+		});
 		connected = true;
 		console.log("Connected to MongoDB");
 	} catch (error) {

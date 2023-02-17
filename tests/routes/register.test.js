@@ -1,5 +1,10 @@
 import { app } from "../../src/app.js";
 import request from "supertest";
+import setup from "../setup.js";
+import teardown from "../teardown.js";
+
+beforeAll(setup);
+afterAll(teardown);
 
 // beforeAll(async () => {
 //     // app.listen(process.env.PORT, async() => {
