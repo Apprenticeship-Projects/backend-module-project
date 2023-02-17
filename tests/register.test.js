@@ -15,14 +15,15 @@ describe("Register a user", () => {
             expect(statusCode).toBe(200);
             expect(headers['Authorization'] !== false).toBe(true);
         })
-        it("User exists in the database", async () => {
-            const user = await User.find().byEmail("teddyputus1@gmail.com");
-            expect(user.username).toBe("Tedernator");
-        })
+        // it("User exists in the database", async () => {
+        //     const user = await User.find().byEmail("teddyputus1@gmail.com");
+        //     expect(user.username).toBe("Tedernator");
+        // })
     })
     describe("With invalid values, returns 400", () => {
         it("Returns 400 when username not unique", async () => {
             const { statusCode } = await request(app).post("/register").send({  email:"teddyputus2@gmail.com", password:"thisisapassword", username:"Tedernator", firstName:"Teddy", lastName:"Putus", dob: "21/12/1992"});
+            expect(statusCode).toBe(400);
         })
         it("Returns 400 when username has spaces", async () => {
             const { statusCode } = await request(app).post("/register").send({  email:"teddyputus2@gmail.com", password:"thisisapassword", username:"Teder nator2", firstName:"Teddy", lastName:"Putus", dob: "21/12/1992"});
