@@ -1,4 +1,4 @@
-import { sign, verify } from "../src/utils/token.js";
+import { sign, verify } from "../../src/utils/token.js";
 
 test("sign() returns a string", () => {
     expect(typeof sign("test")).toBe("string");
