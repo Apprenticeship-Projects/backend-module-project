@@ -40,8 +40,6 @@ const schema = new mongoose.Schema(
 		},
 		password: {
 			type: String,
-			minLength: 8,
-			maxLength: 20,
 			required: true,
 			validate: {
 				validator: (password) => {

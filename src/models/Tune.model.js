@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import GENRES from "../constants/genres";
-import TAGS from "../constants/tags";
+import GENRES from "../constants/genres.json" assert { type: "json" };
+import TAGS from "../constants/tags.json" assert { type: "json" };
 
 const schema = new mongoose.Schema(
 	{
@@ -10,7 +10,7 @@ const schema = new mongoose.Schema(
 		},
 		private: {
 			type: Boolean,
-			default: false,
+			default: true,
 		},
 		title: {
 			type: String,
@@ -24,7 +24,7 @@ const schema = new mongoose.Schema(
 			trim: true,
 			uppercase: true,
 			enum: GENRES,
-			required: true,
+			default: "NONE",
 		},
 		tags: {
 			type: [
@@ -59,7 +59,7 @@ const schema = new mongoose.Schema(
 			type: [
 				{
 					type: { type: String },
-					notes: [String],
+					notes: [[String]],
 				},
 			],
 			default: [],
