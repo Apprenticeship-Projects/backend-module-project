@@ -3,7 +3,7 @@ import { body, validationResult } from "express-validator";
 import { checkErrors } from "../utils/validationMiddleware.js";
 import User from "../models/User.model.js";
 import { createHash } from "../utils/hash.js";
-import bcrypt from "bcrypt";
+
 
 const router = Router();
 
@@ -29,9 +29,10 @@ router.post(
 	checkErrors,
 	async (req, res) => {
 		try {
+			
 			const hashedPass = await createHash(req.body.password);
 
-			const createdUser = new User({
+			const createdUser = await User.create({
 				username: req.body.username,
 				firstName: req.body.firstName,
 				lastName: req.body.lastName,
@@ -40,13 +41,8 @@ router.post(
 				dob: Date.parse(req.body.dob),
 			});
 
-			console.log(createdUser);
-
-			// await createdUser.save();
-
-			res.status(200).send("registered");
+			res.send("registed");
 		} catch (error) {
-			console.log(error);
 			res.status(400).send(error);
 		}
 	}
