@@ -1,6 +1,6 @@
-import {app} from "../server.js";
+import {app} from "../src/app.js";
 import request from "supertest";
-import {User} from '../models/index.js';
+// import {User} from '../models/index.js';
 
 describe("Register a user", () => {
     describe("With valid values", () => {
