@@ -15,10 +15,11 @@ router.post(
 	body("password")
 		.notEmpty()
 		.isLength({ min: 8, max: 20 })
-		.not().contains(/[\s].*/),
+		.not().contains(" "),
 	body("username")
 		.notEmpty()
-		.isLength({ min: 5 }),
+		.isLength({ min: 5 })
+		.not().contains("\W"),
 	body("firstName").notEmpty().isAlpha().isLength({ min: 1 }),
 	body("lastName").notEmpty().isAlpha().isLength({ min: 1 }),
 	body("dob")
