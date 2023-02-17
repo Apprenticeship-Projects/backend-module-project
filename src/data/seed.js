@@ -21,6 +21,8 @@ async function seed() {
 
 	await User.insertMany(users);
 	await Tune.insertMany(tunes);
+
+	await mongoose.disconnect();
 }
 
 seed();
