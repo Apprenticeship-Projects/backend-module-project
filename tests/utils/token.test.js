@@ -1,13 +1,13 @@
-import { sign, verify } from "../../src/utils/token.js";
+import { signToken, verifyToken } from "../../src/utils/token.js";
 
 test("sign() returns a string", () => {
-    expect(typeof sign("test")).toBe("string");
+    expect(typeof signToken("test")).toBe("string");
 });
 
 describe("verify()", () => {
     test("verify() returns an object", () => {
-        const token = sign("test");
-        const obj = verify(token);
+        const token = signToken("test");
+        const obj = verifyToken(token);
 
         expect(Object.keys(obj).length).toBe(3);
         expect(obj.id).toBe("test");
@@ -16,6 +16,6 @@ describe("verify()", () => {
     });
     test("verify() throws an error on an incorrect token", () => {
         const token = "test";
-        expect(() => verify(token)).toThrow();
+        expect(() => verifyToken(token)).toThrow();
     });
 });
