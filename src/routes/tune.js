@@ -1,27 +1,28 @@
 import { Router } from "express";
 const router = Router();
 
-router.get("/tune", (req, res) => {
+// Routes for /tune
+router.get("/", (req, res) => {
   res.status(200).send("/tune GET route");
 });
 
-router.get("/tune/:id", (req, res) => {
+router.get("/:id", (req, res) => {
   res.status(200).send("/tune/:id GET route");
 });
 
-router.post("/tune", (req, res) => {
+router.post("/", (req, res) => {
   res.status(200).send("/tune POST route");
 });
 
-router.put("/tune/:id", (req, res) => {
+router.put("/:id", (req, res) => {
   res.status(200).send("/tune/:id PUT route");
 });
 
-router.post("/tune/:id/rate", (req, res) => {
+router.post("/:id/rate", (req, res) => {
   res.status(200).send("/tune/:id/rate POST route");
 });
 
-router.delete("/tune/:id", (req, res) => {
+router.delete("/:id", (req, res) => {
   res.status(200).send("/tune/:id DELETE route");
 });
 

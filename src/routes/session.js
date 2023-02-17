@@ -1,15 +1,16 @@
 import { Router } from "express";
 const router = Router();
 
-router.get("/session", (req, res) => {
+// Routes for /session
+router.get("/", (req, res) => {
   res.status(200).send("/session GET route");
 });
 
-router.post("/session", (req, res) => {
+router.post("/", (req, res) => {
   res.status(200).send("/session POST route");
 });
 
-router.delete("/session", (req, res) => {
+router.delete("/", (req, res) => {
   res.status(200).send("/session DELETE route");
 });
 

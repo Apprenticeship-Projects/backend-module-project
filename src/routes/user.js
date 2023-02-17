@@ -1,15 +1,16 @@
 import { Router } from "express";
 const router = Router();
 
-router.get("/user", (req, res) => {
+// Routes for /user
+router.get("/", (req, res) => {
   res.status(200).send("/user GET route");
 });
 
-router.put("/user", (req, res) => {
+router.put("/", (req, res) => {
   res.status(200).send("/user PUT route");
 });
 
-router.delete("/user", (req, res) => {
+router.delete("/", (req, res) => {
   res.status(200).send("/user DELETE route");
 });
 
