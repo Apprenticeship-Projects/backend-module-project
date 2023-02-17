@@ -3,7 +3,7 @@ import { body, validationResult } from "express-validator";
 import { checkErrors } from "../utils/validationMiddleware.js";
 import User from "../models/User.model.js";
 import { createHash } from "../utils/hash.js";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 const router = Router();
 
@@ -13,11 +13,19 @@ const router = Router();
 router.post(
 	"/",
 	body("email").notEmpty().isEmail().isLength({ min: 2, max: 32 }),
-	body("password").notEmpty().isLength({ min: 8, max: 20 }).contains(/[^\s].*/),
-	body("username").notEmpty().isLength({ min: 5 }).contains(/[\dA-Za-z_].*/),
-	body("firstName").notEmpty().isAlpha().isLength({ min: 1}),
-	body("lastName").notEmpty().isAlpha().isLength({ min: 1}),
-	body("dob").notEmpty().matches(/\d\d\d\d\/\d\d\/\d\d/),
+	body("password")
+		.notEmpty()
+		.isLength({ min: 8, max: 20 })
+		.contains(/[^\s].*/),
+	body("username")
+		.notEmpty()
+		.isLength({ min: 5 })
+		.contains(/[\dA-Za-z_].*/),
+	body("firstName").notEmpty().isAlpha().isLength({ min: 1 }),
+	body("lastName").notEmpty().isAlpha().isLength({ min: 1 }),
+	body("dob")
+		.notEmpty()
+		.matches(/\d\d\d\d\/\d\d\/\d\d/),
 	checkErrors,
 	async (req, res) => {
 		try {

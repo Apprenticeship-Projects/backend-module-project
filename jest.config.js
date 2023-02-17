@@ -1,9 +1,7 @@
 const config = {
 	globalSetup: "<rootDir>/tests/setup.js",
 	globalTeardown: "<rootDir>/tests/teardown.js",
-	transform: {
-		"^.+\\.(js|jsx)$": "babel-jest",
-	},
+	transform: {},
 };
 
 export default config;
