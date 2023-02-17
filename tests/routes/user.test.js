@@ -1,13 +1,21 @@
 import request from "supertest";
 import { app } from "../../src/app.js";
+import seed from "../src/data/seedFn.js";
 
-// beforeEach(async () => {
-//   await seed();
-//   // user to seed test db {username: "batman", email: 'iamthenight@mail.com', firstName:"Bruce", lastName: "Wyane", password: 'theD@rk_Kn!ght' dob: "01/03/1963"}
-// });
-
+let testUserObject;
 const token = "sign token myself"; // sign with my secret for testing
 const wrongToken = "sign token for wrong user myself"; // sign with my secret for testing
+
+beforeEach(() => {
+  seed();
+  testUserObject = {
+    username: "theFlash1",
+    email: "flash@email.com",
+    firstName: "Henry",
+    lastName: "Allen",
+    dob: new Date("1992-09-29"),
+  };
+});
 
 describe("GET /user when logged in", () => {
   test("returns 200 status when logged in", async () => {
@@ -21,13 +29,7 @@ describe("GET /user when logged in", () => {
     const { user } = await request(app)
       .get("/user")
       .set("Authorization", `Bearer ${token}`);
-    expect(user).toBe({
-      username: "batman",
-      email: "iamthenight@mail.com",
-      firstName: "Bruce",
-      lastName: "Wyane",
-      dob: "1963/03/01",
-    });
+    expect(user).toBe(testUserObject);
   });
 });
 
@@ -57,84 +59,46 @@ describe("PUT /user when logged in", () => {
     const { user } = await request(app)
       .get("/user")
       .set("Authorization", `Bearer ${token}`)
-      .set({ username: "theDarkKnigh" });
-    expect(user).toBe({
-      username: "theDarkKnight",
-      email: "iamthenight@mail.com",
-      firstName: "Bruce",
-      lastName: "Wyane",
-      dob: "1963/03/01",
-    });
+      .set({ username: "fastestMan" });
+    testUserObject.username = "fastestMan";
+    expect(user).toBe(testUserObject);
   });
 
   test("returns updated email", async () => {
     const { user } = await request(app)
       .get("/user")
       .set("Authorization", `Bearer ${token}`)
-      .set({ username: "dark_kight@mail.com" });
-    expect(user).toBe({
-      username: "batman",
-      email: "dark_kignt@mail.com",
-      firstName: "Bruce",
-      lastName: "Wyane",
-      dob: "1963/03/01",
-    });
+      .set({ email: "maninred@mail.com" });
+    testUserObject.email = "maninred@mail.com";
+    expect(user).toBe(testUserObject);
   });
 
   test("returns updated first name", async () => {
     const { user } = await request(app)
       .get("/user")
       .set("Authorization", `Bearer ${token}`)
-      .set({ username: "redacted" });
-    expect(user).toBe({
-      username: "batman",
-      email: "iamthenight@mail.com",
-      firstName: "redacted",
-      lastName: "Wyane",
-      dob: "1963/03/01",
-    });
+      .set({ firstName: "Jay" });
+    testUserObject.firstName = "Jay";
+    expect(user).toBe(testUserObject);
   });
 
   test("returns updated last name", async () => {
     const { user } = await request(app)
       .get("/user")
       .set("Authorization", `Bearer ${token}`)
-      .set({ username: "theDarkKnigh" });
-    expect(user).toBe({
-      username: "batman",
-      email: "iamthenight@mail.com",
-      firstName: "Bruce",
-      lastName: "redacted",
-      dob: "1963/03/01",
-    });
+      .set({ lastName: "Garrick" });
+    testUserObject.lastName = "Garrick";
+    expect(user).toBe(testUserObject);
   });
 
-  test("returns updated username", async () => {
+  test("returns updated dob", async () => {
+    const date = new Date("1940-01-04");
     const { user } = await request(app)
       .get("/user")
       .set("Authorization", `Bearer ${token}`)
-      .set({ username: "theDarkKnigh" });
-    expect(user).toBe({
-      username: "batman",
-      email: "iamthenight@mail.com",
-      firstName: "Bruce",
-      lastName: "Wyane",
-      dob: "1963/03/01",
-    });
-  });
-
-  test("returns updated date", async () => {
-    const { user } = await request(app)
-      .get("/user")
-      .set("Authorization", `Bearer ${token}`)
-      .set({ username: "1988/12/12" });
-    expect(user).toBe({
-      username: "batman",
-      email: "iamthenight@mail.com",
-      firstName: "Bruce",
-      lastName: "Wyane",
-      dob: "1988/12/12",
-    });
+      .set({ dob: date });
+    testUserObject.dob = date;
+    expect(user).toBe(testUserObject);
   });
 });
 
@@ -182,14 +146,14 @@ describe("PUT /user when not logged in", () => {
   test("returns 401 status when updating username", async () => {
     const { statusCode } = await request(app)
       .get("/user")
-      .set({ username: "theDarkKnigh" });
+      .set({ username: "theDarkKnight" });
     expect(statusCode).toBe(401);
   });
 
   test("returns 401 status when updating date", async () => {
     const { statusCode } = await request(app)
       .get("/user")
-      .set({ username: "1988/12/12" });
+      .set({ dob: new Date("1940-01-04") });
     expect(statusCode).toBe(401);
   });
 });
