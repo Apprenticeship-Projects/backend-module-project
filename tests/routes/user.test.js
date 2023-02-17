@@ -11,8 +11,8 @@ const wrongToken = "sign token for wrong user myself"; // sign with my secret fo
 beforeAll(setup);
 afterAll(teardown);
 
-beforeEach(() => {
-	seed(false);
+beforeEach(async () => {
+	await seed(false);
 	testUserObject = {
 		username: "theFlash1",
 		email: "flash@email.com",
