@@ -1,6 +1,7 @@
 import { Router } from "express";
 const router = Router();
 
+
 // Routes for /user
 router.get("/", (req, res) => {
   res.status(200).send("/user GET route");
