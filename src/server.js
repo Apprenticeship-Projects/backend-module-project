@@ -1,4 +1,4 @@
-import {app} from './app.js';
+import { app } from './app.js';
 import mongoose from 'mongoose';
 
 async function connect() {
@@ -16,5 +16,3 @@ app.listen(process.env.PORT, async() => {
     // await seed();
     console.log(`Listening on port ${process.env.PORT}`);
 });
-
-
