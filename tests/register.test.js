@@ -1,6 +1,5 @@
 import {app} from "../src/app.js";
 import request from "supertest";
-import {User} from '../models/index.js';
 
 beforeAll(async () => {
     // Here we will seed the DB
@@ -57,5 +56,5 @@ describe("Register a user", () => {
             const { statusCode } = await request(app).post("/register").send({  email:"teddyputus7@gmail.com", password:"thisisapassword", username:"Tedernator4",  firstName:"Teddy", lastName:"Putus", dob: "21/12/2013"});
             expect(statusCode).toBe(400);
         })
-    }) 
+    })
 })
