@@ -1,16 +1,23 @@
 import {app} from "../src/app.js";
 import request from "supertest";
-// import {User} from '../models/index.js';
+import {User} from '../models/index.js';
+
+beforeAll(async () => {
+    // Here we will seed the DB
+    // And do any other set up requireds for testing
+    // await seed();
+})
 
 describe("Register a user", () => {
     describe("With valid values", () => {
         it("Returns 200 status", async () => {
-            const { statusCode } = await request(app).post("/register").send({  email:"teddyputus1@gmail.com", password:"thisisapassword", username:"Tedernator", firstName:"Teddy", lastName:"Putus", dob: "21/12/1992"});
+            const { statusCode, headers } = await request(app).post("/register").send({  email:"teddyputus1@gmail.com", password:"thisisapassword", username:"Tedernator", firstName:"Teddy", lastName:"Putus", dob: "21/12/1992"});
             expect(statusCode).toBe(200);
+            expect(headers['Authorization'] !== false).toBe(true);
         })
         it("User exists in the database", async () => {
             const user = await User.find().byEmail("teddyputus1@gmail.com");
-            expect(user.username).toBe("Tedernator")
+            expect(user.username).toBe("Tedernator");
         })
     })
     describe("With invalid values, returns 400", () => {
