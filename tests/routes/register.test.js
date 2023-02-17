@@ -1,20 +1,20 @@
 import dotenv from "dotenv";
 dotenv.config();
-import {app} from "../src/app.js";
+import {app} from "../../src/app.js";
 import request from "supertest";
 import mongoose, { connect } from 'mongoose';
 
-beforeAll(async () => {
-    // app.listen(process.env.PORT, async() => {
-    //     await connect();
-    // });
-    mongoose.set("strictQuery", false); // The default in Mongoose 7
-    await mongoose.connect('mongodb://127.0.0.1:27017/backend-module-project');
-})
-
-afterAll(async () => {
-    // app.close();
-})
+// beforeAll(async () => {
+//     // app.listen(process.env.PORT, async() => {
+//     //     await connect();
+//     // });
+//     mongoose.set("strictQuery", false); // The default in Mongoose 7
+//     await mongoose.connect('mongodb://127.0.0.1:27017/backend-module-project');
+// })
+//
+// afterAll(async () => {
+//     // app.close();
+// })
 
 describe("Register a user", () => {
     describe("With valid values", () => {

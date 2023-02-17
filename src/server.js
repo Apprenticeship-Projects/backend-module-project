@@ -1,17 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { app } from './app.js';
-import mongoose from 'mongoose';
-
-async function connect() {
-    try {
-        mongoose.set('strictQuery', false); // The default in Mongoose 7
-        await mongoose.connect(process.env.CONNECTION_STRING);
-        console.log("Connected to MongoDB");
-    } catch (error) {
-        console.log(error);
-    }
-}
+import { connect } from './utils/db.js';
 
 app.listen(process.env.PORT, async() => {
     await connect();

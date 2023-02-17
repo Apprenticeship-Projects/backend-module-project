@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { body, validationResult } from "express-validator";
-import { checkErrors } from "../utils/validationMiddleware";
+import { body } from "express-validator";
+import { checkErrors } from "../utils/validationMiddleware.js";
 import User from "../models/User.model.js";
-import { createHash } from "../utils/hash";
-import bcrypt from 'bcrypt';
+import { createHash } from "../utils/hash.js";
 
 const router = Router();
 
@@ -34,7 +33,7 @@ router.post(
 
 			console.log(createdUser);
 
-			await createdUser.save();
+			// await createdUser.save();
 
 			res.status(200).send("registered");
 		} catch (error) {

@@ -1,5 +1,6 @@
 const config = {
-    setupFiles: ["<rootDir>/tests/setup.js"]
+    globalSetup: "<rootDir>/tests/setup.js",
+    globalTeardown: "<rootDir>/tests/teardown.js"
 };
 
 export default config;
