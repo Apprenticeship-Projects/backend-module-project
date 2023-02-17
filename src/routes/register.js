@@ -41,7 +41,7 @@ router.post(
 				dob: Date.parse(req.body.dob),
 			});
 
-			res.send("registed");
+			res.send("registered");
 		} catch (error) {
 			res.status(400).send(error);
 		}
