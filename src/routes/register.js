@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { body } from "express-validator";
+import { body, validationResult } from "express-validator.js";
 import { checkErrors } from "../utils/validationMiddleware.js";
 import User from "../models/User.model.js";
 import { createHash } from "../utils/hash.js";
+import bcrypt from 'bcrypt';
 
 const router = Router();
 
@@ -11,12 +12,12 @@ const router = Router();
 //Register user
 router.post(
 	"/",
-	body("email").notEmpty().isEmail(),
-	body("password").notEmpty().isLength({ min: 8, max: 20 }),
-	body("username").notEmpty(),
-	body("firstName").notEmpty(),
-	body("lastName").notEmpty(),
-	body("dob").notEmpty(),
+	body("email").notEmpty().isEmail().isLength({ min: 2, max: 32 }),
+	body("password").notEmpty().isLength({ min: 8, max: 20 }).contains(/[^\s].*/),
+	body("username").notEmpty().isLength({ min: 5 }).contains(/[\dA-Za-z_].*/),
+	body("firstName").notEmpty().isAlpha().isLength({ min: 1}),
+	body("lastName").notEmpty().isAlpha().isLength({ min: 1}),
+	body("dob").notEmpty().matches(/\d\d\d\d\/\d\d\/\d\d/),
 	checkErrors,
 	async (req, res) => {
 		try {

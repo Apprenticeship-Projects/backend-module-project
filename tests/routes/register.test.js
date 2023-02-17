@@ -62,7 +62,7 @@ describe("Register a user", () => {
             expect(statusCode).toBe(400);
         })
         it("Returns 400 when user too young (<13)", async () => {
-            const { statusCode } = await request(app).post("/register").send({  email:"teddyputus7@gmail.com", password:"thisisapassword", username:"Tedernator4",  firstName:"Teddy", lastName:"Putus", dob: "1992/12/21"});
+            const { statusCode } = await request(app).post("/register").send({  email:"teddyputus7@gmail.com", password:"thisisapassword", username:"Tedernator4",  firstName:"Teddy", lastName:"Putus", dob: "2013/12/21"});
             expect(statusCode).toBe(400);
         })
     })
