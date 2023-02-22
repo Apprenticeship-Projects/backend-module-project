@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import validator_pkg from "validator";
 import Role from "../constants/roles.json" assert { type: "json" };
+import newID from "../utils/snowflake.js";
 
 const schema = new mongoose.Schema(
 	{
@@ -96,6 +97,23 @@ const schema = new mongoose.Schema(
 	},
 	{
 		timestamps: true,
+		methods: {
+			async createSession() {
+				const sessionId = newID();
+				this.sessions.push(sessionId);
+				await this.save();
+				return sessionId;
+			},
+			async removeSession(session) {
+				const newSessions = this.sessions.filter(
+					(ses) => ses != session
+				);
+				const removed = this.sessions.length > newSessions.length;
+				this.sessions = newSessions;
+				await this.save();
+				return removed;
+			},
+		},
 	}
 );
 
