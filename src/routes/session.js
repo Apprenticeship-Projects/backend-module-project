@@ -2,7 +2,6 @@ import { Router } from "express";
 import { verifyHash } from "../utils/hash.js";
 import { User } from "../models/index.js";
 import { signToken } from "../utils/token.js";
-import newID from "../utils/snowflake.js";
 import { body } from "express-validator";
 import { checkErrors } from "../middleware/validation.js";
 const router = Router();
