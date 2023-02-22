@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator_pkg from "validator";
+import Role from "../constants/roles.json" assert { type: "json" };
 
 const schema = new mongoose.Schema(
 	{
@@ -49,6 +50,12 @@ const schema = new mongoose.Schema(
 				},
 				message: () => `Password must be a hash!`,
 			},
+		},
+		role: {
+			type: Number,
+			enum: Object.values(Role),
+			default: Role.USER,
+			alias: "permissionLevel",
 		},
 		sessions: {
 			type: [String],
