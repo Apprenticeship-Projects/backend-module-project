@@ -5,7 +5,7 @@ const privateKey = fs.readFileSync("./keys/private-key.pem");
 const publicKey = fs.readFileSync("./keys/public-key.pem");
 
 export function signToken(id) {
-    return jsonwebtoken.sign({ id }, privateKey, { algorithm: "ES256", expiresIn: "30d" });
+    return jsonwebtoken.sign({ "ses": id }, privateKey, { algorithm: "ES256", expiresIn: "30d" });
 }
 
 export function verifyToken(token) {
