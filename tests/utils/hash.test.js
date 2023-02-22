@@ -1,10 +1,13 @@
 import { createHash, verifyHash } from "../../src/utils/hash.js";
+import setup from "../setup.js";
+import teardown from "../teardown.js";
 
-const SALT_ROUNDS = 10;
+beforeAll(setup);
+afterAll(teardown);
 
 test("createHash() returns a hash", async () => {
 	expect(await createHash("test")).toMatch(
-		new RegExp(`\\$2b\\$${SALT_ROUNDS}\\$[A-Za-z0-9/.]+`)
+		new RegExp(`\\$2b\\$${process.env.SALT_COUNT}\\$[A-Za-z0-9/.]+`)
 	);
 });
 
