@@ -41,14 +41,14 @@ const schema = new mongoose.Schema(
 		password: {
 			type: String,
 			required: true,
-			// validate: {
-			// 	validator: (password) => {
-			// 		return /^\$2[ayb]?\$[0-9]{2}\$[A-Za-z0-9\.\/]/.test(
-			// 			password
-			// 		);
-			// 	},
-			// 	message: () => `Password must be a hash!`,
-			// },
+			validate: {
+				validator: (password) => {
+					return /^\$2[ayb]?\$[0-9]{2}\$[A-Za-z0-9\.\/]/.test(
+						password
+					);
+				},
+				message: () => `Password must be a hash!`,
+			},
 		},
 		sessions: {
 			type: [String],
