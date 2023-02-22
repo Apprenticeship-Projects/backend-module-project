@@ -75,7 +75,7 @@ describe("Register a user", () => {
 		});
 		it("Returns 400 when email not unique", async () => {
 			const { statusCode } = await request(app).post("/register").send({
-				email: "teddyputus2@gmail.com",
+				email: "teddyputus1@gmail.com",
 				password: "thisisapassword",
 				username: "Tedernator2",
 				firstName: "Teddy",

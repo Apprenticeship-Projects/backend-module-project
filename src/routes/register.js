@@ -19,7 +19,7 @@ router.post(
 	body("username")
 		.notEmpty()
 		.isLength({ min: 5 })
-		.not().contains("\W").not().contains(" "),
+		.not().matches(/[^a-zA-Z0-9_]/),
 	body("firstName").notEmpty().isAlpha().isLength({ min: 1 }),
 	body("lastName").notEmpty().isAlpha().isLength({ min: 1 }),
 	body("dob")
