@@ -11,16 +11,13 @@ const wrongToken = "sign token for wrong user myself"; // sign with my secret fo
 beforeAll(setup);
 afterAll(teardown);
 
-beforeEach(async () => {
-	await seed(false);
-	testUserObject = {
-		username: "theFlash1",
-		email: "flash@email.com",
-		firstName: "Henry",
-		lastName: "Allen",
-		dob: new Date("1992-09-29"),
-	};
-});
+testUserObject = {
+	username: "theFlash1",
+	email: "flash@email.com",
+	firstName: "Henry",
+	lastName: "Allen",
+	dob: new Date("1992-09-29"),
+};
 
 describe("GET /user when logged in", () => {
 	test("returns 200 status when logged in", async () => {
