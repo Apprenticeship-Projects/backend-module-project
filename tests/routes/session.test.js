@@ -25,4 +25,43 @@ describe("/session", () => {
 			});
 		expect(statusCode).toBe(403);
 	});
+	it("No data", async () => {
+		const { statusCode } = await request(app)
+			.post("/session")
+			.send();
+		expect(statusCode).toBe(400);
+	});
+	it("Empty JSON", async () => {
+		const { statusCode } = await request(app)
+			.post("/session")
+			.send({});
+		expect(statusCode).toBe(400);
+	});
+	it("Null values", async () => {
+		const { statusCode } = await request(app)
+			.post("/session")
+			.send({
+				username: null,
+				password: null,
+			});
+		expect(statusCode).toBe(400);
+	});
+	it("Missing username", async () => {
+		const { statusCode } = await request(app)
+			.post("/session")
+			.send({
+				username: null,
+				password: "flash123",
+			});
+		expect(statusCode).toBe(400);
+	});
+	it("Missing username", async () => {
+		const { statusCode } = await request(app)
+			.post("/session")
+			.send({
+				username: null,
+				password: "flash123",
+			});
+		expect(statusCode).toBe(400);
+	});
 });

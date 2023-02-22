@@ -26,9 +26,9 @@ router.post(
     return;
   }
   if (await verifyHash(req.body.password, user.password)) {
-    const id = newID();
-    await User.findOneAndUpdate({ _id: user._id }, { $push: { sessions: id } });
-    const token = signToken(id);
+    const ses = newID();
+    await User.findOneAndUpdate({ _id: user._id }, { $push: { sessions: ses } });
+    const token = signToken(user._id, ses);
     res.status(200).cookie("token", token, { httpOnly: true, sameSite: "strict" }).send();
     return;
   }

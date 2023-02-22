@@ -4,8 +4,8 @@ import fs from "fs";
 const privateKey = fs.readFileSync("./keys/private-key.pem");
 const publicKey = fs.readFileSync("./keys/public-key.pem");
 
-export function signToken(id) {
-  return jsonwebtoken.sign({ ses: id }, privateKey, {
+export function signToken(uid, ses) {
+  return jsonwebtoken.sign({ uid, ses }, privateKey, {
     algorithm: "ES256",
     expiresIn: "30d",
   });
