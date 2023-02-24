@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { splitToken, verifyToken } from "../utils/token";
+import { auth } from "../middleware/auth.js";
 
 const router = Router();
 
 // Routes for /user
-router.get("/", (req, res) => {
-  // !req.user
+router.get("/", auth, (req, res) => {
+  console.log(req);
   res.status(200).send("/user GET route");
 });
 
