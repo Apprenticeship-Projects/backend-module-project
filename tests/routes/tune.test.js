@@ -3,6 +3,7 @@ import { app } from "../../src/app.js";
 import { COOKIE } from "../../src/constants/cookie.js";
 import seed from "../../src/data/seedFn.js";
 import { Rating, User, Tune } from "../../src/models/index.js";
+import { signToken } from "../../src/utils/token.js";
 import setup from "../setup.js";
 import teardown from "../teardown.js";
 
@@ -28,7 +29,9 @@ beforeEach(async () => {
 	testUser.tunes.push(testTune);
 	await testUser.save();
 
-	testTune2 = await Tune.findOne({ title: { $not: "Announcement" } }).exec();
+	testTune2 = await Tune.findOne({
+		title: { $not: { $eq: "Announcement" } },
+	}).exec();
 });
 
 describe("GET /tune", () => {
