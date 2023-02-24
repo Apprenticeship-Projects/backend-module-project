@@ -1,8 +1,18 @@
 import Role from "../../src/constants/roles.json" assert { type: "json" };
-import {permissionLevel} from '../../src/middleware/auth.js';
-import {expect, jest, test} from '@jest/globals';
+import {permissionLevel, auth} from '../../src/middleware/auth.js';
+import {expect, test} from '@jest/globals';
 import request from "supertest";
 import { app } from "../../src/app.js";
+import { COOKIE } from "../../src/constants/cookie.js";
+import seed from "../../src/data/seedFn.js";
+import { User } from "../../src/models/index.js";
+import { signToken } from "../../src/utils/token";
+import setup from "../setup.js";
+import teardown from "../teardown.js";
+
+
+
+
 describe('Test permissionLevel middleware', () => {
 
     test("permissionLevel authorised when user level is greater than or equal to required permission level", async () => {
@@ -65,21 +75,36 @@ describe('Test permissionLevel middleware', () => {
 				.send({someRandomThing:0});
 			expect(statusCode).toBe(404);
     })
-    // test("401 status returned when user level is less than  required permission level", () => {
-    //     const middlewareFunction = permissionLevel(Role.ADMIN)
-    //     let nextFunction= jest.fn();
-    //     const mockResponse = () => {
-    //         const res = {};
-    //         res.status = jest.fn().mockReturnValue(res);
-    //         res.json = jest.fn().mockReturnValue(res);
-    //         return res;
-    //       };
-    //     let mockRequest = {user:
-    //                             {role: Role.USER}
-    //                         }
+})
 
-    //     const expectedResponse = middlewareFunction(mockRequest, mockResponse, nextFunction);
+describe("Test the auth middleware function", () => {
+    beforeAll(setup);
+    afterAll(teardown);
 
-    //     expect(expectedResponse.status).toEqual(401);
-    // })
+    beforeEach(async () => {
+        await seed(false);
+    });
+
+
+    test("auth function lets us pass if session and user match", async () => {
+    
+        const testUser = await User.findOne().exec();
+    
+        if (!testUser) throw new Error("Test user not found in db");
+    
+        const sessionId = await testUser.createSession();
+        const testUserToken = signToken(testUser._id, sessionId);
+        await testUser.save();
+
+        app.get('/test3',
+        auth, 
+        async (req, res) => {
+            res.sendStatus(200);
+        });
+
+        const { statusCode } = await request(app)
+				.get("/test3")
+				.set('Cookie', [`${COOKIE}=${testUserToken}`]);
+			expect(statusCode).toBe(200);
+    })
 })
