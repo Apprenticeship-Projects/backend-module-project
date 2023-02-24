@@ -106,7 +106,7 @@ const schema = new mongoose.Schema(
 			},
 			async removeSession(session) {
 				const newSessions = this.sessions.filter(
-					(ses) => ses != session
+					(ses) => ses !== session
 				);
 				const removed = this.sessions.length > newSessions.length;
 				this.sessions = newSessions;

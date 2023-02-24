@@ -2,7 +2,8 @@ import request from "supertest";
 import { app } from "../../src/app.js";
 import { COOKIE } from "../../src/constants/cookie.js";
 import seed from "../../src/data/seedFn.js";
-import User from "../../src/models/User.model.js";
+import { Rating, User, Tune } from "../../src/models/index.js";
+import { signToken } from "../../src/utils/token.js";
 import setup from "../setup.js";
 import teardown from "../teardown.js";
 
@@ -11,6 +12,8 @@ afterAll(teardown);
 
 let testUser;
 let testUserToken;
+let testTune;
+let testTune2;
 
 beforeEach(async () => {
 	await seed(false);
@@ -21,6 +24,14 @@ beforeEach(async () => {
 
 	const sessionId = await testUser.createSession();
 	testUserToken = signToken(testUser._id, sessionId);
+
+	testTune = await Tune.findOne({ title: "Announcement" }).exec();
+	testUser.tunes.push(testTune);
+	await testUser.save();
+
+	testTune2 = await Tune.findOne({
+		title: { $not: { $eq: "Announcement" } },
+	}).exec();
 });
 
 describe("GET /tune", () => {
@@ -29,6 +40,11 @@ describe("GET /tune", () => {
 			.get("/tune")
 			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
 		expect(statusCode).toBe(200);
+	});
+
+	test("returns 401 status when not logged in", async () => {
+		const { statusCode } = await request(app).get("/tune");
+		expect(statusCode).toBe(401);
 	});
 
 	test("returns upto first 100 tunes", async () => {
@@ -47,176 +63,264 @@ describe("GET /tune", () => {
 
 		expect(Object.keys(body[0])).toEqual(
 			expect.arrayContaining([
+				"_id",
 				"title",
 				"owner",
 				"genre",
 				"tags",
 				"bpm",
-				"rating",
+				"rating", // Rating should be calculated before being sent to client
 			])
 		);
 	});
 
-	test("limit query should ", async () => {
+	test("'limit' query should change page size", async () => {
 		const { body } = await request(app)
 			.get("/tune")
+			.query({
+				limit: 3,
+			})
 			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
 
-		expect(Object.keys(body[0])).toEqual(
+		expect(body.length).toBeLessThanOrEqual(3);
+	});
+
+	test("'page' query should change page", async () => {
+		const { body } = await request(app)
+			.get("/tune")
+			.query({
+				limit: 3,
+				page: 1,
+			})
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
+
+		expect(body.length).toBe(1);
+	});
+
+	test("'user' query should only return the user's tunes", async () => {
+		const { body } = await request(app)
+			.get("/tune")
+			.query({
+				user: true,
+			})
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
+
+		expect(body.length).toBe(1);
+		expect(body[0].title).toBe("Announcement");
+	});
+});
+
+describe("GET /tune/:id", () => {
+	test("should return all tune info for valid id", async () => {
+		const { body } = await request(app)
+			.get("/tune/" + testTune._id)
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
+
+		expect(body).toBeTruthy();
+		expect(Object.keys(body)).toEqual(
 			expect.arrayContaining([
+				"_id",
 				"title",
 				"owner",
 				"genre",
 				"tags",
 				"bpm",
-				"rating",
+				"rating", // Rating should be calculated before being sent to client
+				"tempo",
+				"tracks",
 			])
 		);
 	});
-});
 
-describe("GET /user when not logged in", () => {
-	test("returns 401", async () => {
-		const { statusCode } = await request(app).get("/user");
-		expect(statusCode).toBe(401);
-	});
-
-	test("returns 401 with wrong token", async () => {
+	test("should return 404 status for invalid id", async () => {
 		const { statusCode } = await request(app)
-			.get("/user")
-			.set("Authorization", `Bearer ${wrongToken}`);
-		expect(statusCode).toBe(401);
+			.get("/tune/1234")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
+
+		expect(statusCode).toBe(404);
 	});
 });
 
-describe("PUT /user when logged in", () => {
-	test("returns 200 status", async () => {
+describe("POST /tune", () => {
+	test("should return the tune entry with 200 status code", async () => {
+		const { body } = await request(app)
+			.post("/tune")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`])
+			.send({
+				private: true,
+				title: "Cool new tune",
+				genre: "K_POP",
+				tags: [],
+				tempo: "8n",
+				tracks: [
+					{
+						type: "SYNTH",
+						notes: [
+							["C3", "4n"],
+							["C3", "4n"],
+							["C3", "4n"],
+						],
+					},
+				],
+			});
+
+		expect(body).toBeTruthy();
+		expect(Object.keys(body)).toContain("_id");
+	});
+
+	test("should return 400 status code for bad title", async () => {
 		const { statusCode } = await request(app)
-			.put("/user")
-			.set("Authorization", `Bearer ${token}`);
+			.post("/tune")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`])
+			.send({
+				private: true,
+				title: "This is a tune who's title is too long and should cause a 400 error!",
+				genre: "POP_ROCK",
+				tags: [],
+				tempo: "8n",
+				tracks: [
+					{
+						type: "SYNTH",
+						notes: [],
+					},
+				],
+			});
+
+		expect(statusCode).toBe(400);
+	});
+
+	test("should return 400 status code for bad genre", async () => {
+		const { statusCode } = await request(app)
+			.post("/tune")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`])
+			.send({
+				private: true,
+				title: "Tune title",
+				genre: "NOT_A_GENRE",
+				tags: [],
+				tempo: "8n",
+				tracks: [
+					{
+						type: "SYNTH",
+						notes: [],
+					},
+				],
+			});
+
+		expect(statusCode).toBe(400);
+	});
+
+	test("should return 400 status code for a bad tag", async () => {
+		const { statusCode } = await request(app)
+			.post("/tune")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`])
+			.send({
+				private: true,
+				title: "Tune title",
+				genre: "NONE",
+				tags: ["NOT_A_TAG"],
+				tempo: "8n",
+				tracks: [
+					{
+						type: "SYNTH",
+						notes: [],
+					},
+				],
+			});
+
+		expect(statusCode).toBe(400);
+	});
+});
+
+describe("PUT /tune/:id", () => {
+	test("should return the updated entry", async () => {
+		const { body } = await request(app)
+			.post("/tune/" + testTune._id)
+			.set("Cookie", [`${COOKIE}=${testUserToken}`])
+			.send({
+				private: true,
+			});
+
+		expect(body.private).toBeTruthy();
+	});
+
+	test("should return 400 for a bad value", async () => {
+		const { statusCode } = await request(app)
+			.post("/tune/" + testTune._id)
+			.set("Cookie", [`${COOKIE}=${testUserToken}`])
+			.send({
+				title: "Hi",
+			});
+
+		expect(statusCode).toBe(400);
+	});
+});
+
+describe("DELETE /tune/:id", () => {
+	test("should return 200 status code if successfully deleted", async () => {
+		const { statusCode } = await request(app)
+			.delete("/tune/" + testTune._id)
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
+
 		expect(statusCode).toBe(200);
 	});
 
-	test("returns updated username", async () => {
-		const { user } = await request(app)
-			.get("/user")
-			.set("Authorization", `Bearer ${token}`)
-			.set({ username: "fastestMan" });
-		testUserObject.username = "fastestMan";
-		expect(user).toBe(testUserObject);
+	test("should return 400 status code if tune does not exist", async () => {
+		const { statusCode } = await request(app)
+			.delete("/tune/1234")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
+
+		expect(statusCode).toBe(400);
 	});
 
-	test("returns updated email", async () => {
-		const { user } = await request(app)
-			.get("/user")
-			.set("Authorization", `Bearer ${token}`)
-			.set({ email: "maninred@mail.com" });
-		testUserObject.email = "maninred@mail.com";
-		expect(user).toBe(testUserObject);
-	});
+	test("should return 403 status code if user does not have permission to delete", async () => {
+		const { statusCode } = await request(app)
+			.delete("/tune/" + testTune2._id)
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
 
-	test("returns updated first name", async () => {
-		const { user } = await request(app)
-			.get("/user")
-			.set("Authorization", `Bearer ${token}`)
-			.set({ firstName: "Jay" });
-		testUserObject.firstName = "Jay";
-		expect(user).toBe(testUserObject);
-	});
-
-	test("returns updated last name", async () => {
-		const { user } = await request(app)
-			.get("/user")
-			.set("Authorization", `Bearer ${token}`)
-			.set({ lastName: "Garrick" });
-		testUserObject.lastName = "Garrick";
-		expect(user).toBe(testUserObject);
-	});
-
-	test("returns updated dob", async () => {
-		const date = new Date("1940-01-04");
-		const { user } = await request(app)
-			.get("/user")
-			.set("Authorization", `Bearer ${token}`)
-			.set({ dob: date });
-		testUserObject.dob = date;
-		expect(user).toBe(testUserObject);
+		expect(statusCode).toBe(403);
 	});
 });
 
-describe("PUT /user when not logged in", () => {
-	test("returns 401 status", async () => {
-		const { statusCode } = await request(app).put("/user");
-		expect(statusCode).toBe(200);
+describe("POST /tune/:id/rate", () => {
+	test("should return an updated rating number", async () => {
+		const { body } = await request(app)
+			.delete("/tune/" + testTune._id + "/rate")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`])
+			.send({
+				value: 5,
+			});
+
+		expect(body).toBe(5);
 	});
 
-	test("returns 401 status with wrong token", async () => {
+	test("should return an average of all ratings", async () => {
+		let rating = new Rating({
+			tune: testTune._id,
+			value: 1,
+		});
+		rating.save();
+		testTune.ratings.push(rating);
+		testTune.save();
+
+		const { body } = await request(app)
+			.delete("/tune/" + testTune._id + "/rate")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`])
+			.send({
+				value: 5,
+			});
+
+		expect(body).toBe(3);
+	});
+
+	test("should return a 400 status code if value is invalid", async () => {
 		const { statusCode } = await request(app)
-			.put("/user")
-			.set("Authorization", `Bearer ${wrongToken}`);
-		expect(statusCode).toBe(200);
-	});
+			.delete("/tune/" + testTune._id + "/rate")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`])
+			.send({
+				value: 0,
+			});
 
-	test("returns 401 status when updating username", async () => {
-		const { statusCode } = await request(app)
-			.get("/user")
-			.set({ username: "theDarkKnigh" });
-		expect(statusCode).toBe(401);
-	});
-
-	test("returns 401 status when updating email", async () => {
-		const { statusCode } = await request(app)
-			.get("/user")
-			.set({ username: "dark_kight@mail.com" });
-		expect(statusCode).toBe(401);
-	});
-
-	test("returns 401 status when updating first name", async () => {
-		const { statusCode } = await request(app)
-			.get("/user")
-			.set({ username: "redacted" });
-		expect(statusCode).toBe(401);
-	});
-
-	test("returns 401 status when updating last name", async () => {
-		const { statusCode } = await request(app)
-			.get("/user")
-			.set({ username: "theDarkKnigh" });
-		expect(statusCode).toBe(401);
-	});
-
-	test("returns 401 status when updating username", async () => {
-		const { statusCode } = await request(app)
-			.get("/user")
-			.set({ username: "theDarkKnight" });
-		expect(statusCode).toBe(401);
-	});
-
-	test("returns 401 status when updating date", async () => {
-		const { statusCode } = await request(app)
-			.get("/user")
-			.set({ dob: new Date("1940-01-04") });
-		expect(statusCode).toBe(401);
-	});
-});
-
-describe("DELETE /user", () => {
-	test("Returns 202 - Accepted status when logged in", async () => {
-		const { statusCode } = await request(app)
-			.delete("/user")
-			.set("Authorization", `Bearer ${token}`);
-		expect(statusCode).toBe(202);
-	});
-
-	test("Returns 401 status with no token", async () => {
-		const { statusCode } = await request(app).delete("/user");
-		expect(statusCode).toBe(401);
-	});
-
-	test("Returns 401 status with wrong token", async () => {
-		const { statusCode } = await request(app)
-			.delete("/user")
-			.set("Authorization", `Bearer ${wrongToken}`);
-		expect(statusCode).toBe(401);
+		expect(statusCode).toBe(400);
 	});
 });

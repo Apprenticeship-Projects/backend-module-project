@@ -44,7 +44,7 @@ usersRouter.post(
 			where: {
 				username: req.body.username,
 			},
-		});
+		}).exec();
 		if (user) {
 			return res.status(409).send("Already created");
 		}
@@ -104,11 +104,11 @@ usersRouter.post("/login", async (req, res) => {
 			include: ["token"],
 		},
 		where: data,
-	});
+	}).exec();
 
 	//send error status incase cannot find user
 	if (!user) {
-		return res.sendStatus(403);
+		return res.sendStatus(401);
 	}
 
 	res.cookie(COOKIE, user.getDataValue("token"), {
