@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { splitToken, verifyToken } from "../utils/token";
+import { splitToken, verifyToken } from "../utils/token.js";
 
 const router = Router();
 
