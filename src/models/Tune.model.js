@@ -32,7 +32,7 @@ const schema = new mongoose.Schema(
 					type: String,
 					trim: true,
 					uppercase: true,
-					enum: TAGS,
+					enum: TAGS.concat(GENRES),
 				},
 			],
 			default: [],
