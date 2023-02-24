@@ -21,7 +21,7 @@ router.post(
 	checkErrors,
 	async (req, res) => {
 		const username = req.body.username;
-		const user = await User.findOne({ username });
+		const user = await User.findOne({ username }).exec();
 		if (user == null) {
 			res.sendStatus(401);
 			return;

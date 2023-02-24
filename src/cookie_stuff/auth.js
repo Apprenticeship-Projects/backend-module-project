@@ -20,7 +20,7 @@ export default function auth(req, res, next) {
 					password: payload.password,
 					token: token,
 				},
-			});
+			}).exec();
 			if (!user) {
 				return res
 					.clearCookie(COOKIE)
