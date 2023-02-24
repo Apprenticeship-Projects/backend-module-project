@@ -18,7 +18,7 @@ describe("/session", () => {
 
 		const cookies = headers["set-cookie"];
 		expect(cookies.length).toBe(1);
-		expect(cookies[0]).toMatch(/token=[A-Za-z0-9._-]+; Path=\/; HttpOnly; SameSite=Strict/);
+		expect(cookies[0]).toMatch(/^token=[A-Za-z0-9._-]+; Path=\/; HttpOnly; SameSite=Strict$/);
 	});
 	it("Invalid username", async () => {
 		const { statusCode, headers } = await request(app)
@@ -27,7 +27,7 @@ describe("/session", () => {
 				username: "theFlash",
 				password: "flash123!",
 			});
-		expect(statusCode).toBe(403);
+		expect(statusCode).toBe(401);
 		expect(headers["set-cookie"]).toBeUndefined();
 	});
 	it("Invalid password", async () => {
@@ -37,7 +37,7 @@ describe("/session", () => {
 				username: "theFlash1",
 				password: "flash123",
 			});
-		expect(statusCode).toBe(403);
+		expect(statusCode).toBe(401);
 		expect(headers["set-cookie"]).toBeUndefined();
 	});
 	it("No data", async () => {

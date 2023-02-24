@@ -108,7 +108,7 @@ usersRouter.post("/login", async (req, res) => {
 
 	//send error status incase cannot find user
 	if (!user) {
-		return res.sendStatus(403);
+		return res.sendStatus(401);
 	}
 
 	res.cookie(COOKIE, user.getDataValue("token"), {

@@ -11,7 +11,7 @@ export default function auth(req, res, next) {
 		process.env.TOKEN_SECRET,
 		async (error, payload) => {
 			if (error) {
-				return res.status(403).send(error);
+				return res.status(401).send(error);
 			}
 
 			const user = await User.findOne({

@@ -23,7 +23,7 @@ router.post(
 		const username = req.body.username;
 		const user = await User.findOne({ username });
 		if (user == null) {
-			res.sendStatus(403);
+			res.sendStatus(401);
 			return;
 		}
 		if (await verifyHash(req.body.password, user.password)) {
@@ -34,7 +34,7 @@ router.post(
 				.send();
 			return;
 		}
-		res.sendStatus(403);
+		res.sendStatus(401);
 	}
 );
 
