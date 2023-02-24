@@ -1,7 +1,7 @@
 import { signToken, verifyToken } from "../../src/utils/token.js";
 
 test("sign() returns a string", () => {
-    expect(typeof signToken("testuid", "testses")).toBe("string");
+    expect(signToken("testuid", "testses")).toMatch(/[A-Za-z0-9._-]+/);
 });
 
 describe("verify()", () => {
