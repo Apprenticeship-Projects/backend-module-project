@@ -1,7 +1,6 @@
 [
     {
         "title": "Announcement",
-        "genre": "NONE",
         "tempo": "4n",
         "tracks": [
             {
@@ -20,6 +19,36 @@
                         "8n"
                     ]
                 ]
+            }
+        ]
+    },
+    {
+        "title": "Random Tune 1",
+        "tempo": "4n",
+        "tracks": [
+            {
+                "type": "SYNTH",
+                "notes": []
+            }
+        ]
+    },
+    {
+        "title": "Random Tune 2",
+        "tempo": "4n",
+        "tracks": [
+            {
+                "type": "SYNTH",
+                "notes": []
+            }
+        ]
+    },
+    {
+        "title": "Random Tune 3",
+        "tempo": "4n",
+        "tracks": [
+            {
+                "type": "SYNTH",
+                "notes": []
             }
         ]
     }
