@@ -4,7 +4,7 @@ import { User } from "../models/index.js";
 import { verifyToken } from "../utils/token.js";
 
 // Specify required permission level for a route, set to User level (0) as default.
-export function permissionLevel(requiredPermissionLevel = Role.USER) {
+function permissionLevel(requiredPermissionLevel = Role.USER) {
   // Function to check permission level.
   return async function checkPermissionLevel(req, res, next) {
     // Extract the User from the request (attached to req by token verification middleware).
@@ -25,15 +25,16 @@ export function permissionLevel(requiredPermissionLevel = Role.USER) {
   };
 }
 
-export async function auth(req, res, next) {
-  const token = req.cookies[COOKIE];
+async function auth(req, res, next) {
+  const token = req.cookies["token"];
+
   if (!token) {
     return next();
   }
 
   const { uid, ses } = verifyToken(token);
 
-  const user = uid ? await User.find({ _id: uid }) : null;
+  const user = uid ? await User.findOne({ _id: uid }) : null;
 
   if (!user || !user.sessions.includes(ses)) {
     res.clearCookie(COOKIE);
@@ -42,3 +43,5 @@ export async function auth(req, res, next) {
   }
   next();
 }
+
+export { permissionLevel, auth };
