@@ -40,6 +40,7 @@ async function auth(req, res, next) {
     res.clearCookie(COOKIE);
   } else {
     req.user = user;
+    req.uid = uid;
   }
   next();
 }
