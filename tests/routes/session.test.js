@@ -20,7 +20,7 @@ describe("/session", () => {
 		expect(cookies.length).toBe(1);
 		expect(cookies[0]).toMatch(/token=[A-Za-z0-9._-]+; Path=\/; HttpOnly; SameSite=Strict/);
 	});
-	it("Invalid user", async () => {
+	it("Invalid username", async () => {
 		const { statusCode, headers } = await request(app)
 			.post("/session")
 			.send({
