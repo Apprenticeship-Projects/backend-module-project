@@ -9,7 +9,10 @@ export function permissionLevel(requiredPermissionLevel=Role.USER){
     return async function checkPermissionLevel(req, res, next){
         // Extract the User from the request (attached to req by token verification middleware).
         const foundUser = req.user;
-        
+        console.log(foundUser);
+        console.log(req);
+        console.log(res);
+        console.log(next)
         if(foundUser){
             // If the permission level is OK, go to next function.
             if(foundUser.role >= requiredPermissionLevel){
