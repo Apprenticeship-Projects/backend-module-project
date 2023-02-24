@@ -20,6 +20,15 @@ describe("/session", () => {
 		const { statusCode } = await request(app)
 			.post("/session")
 			.send({
+				username: "theFlash",
+				password: "flash123!",
+			});
+		expect(statusCode).toBe(403);
+	});
+	it("Invalid password", async () => {
+		const { statusCode } = await request(app)
+			.post("/session")
+			.send({
 				username: "theFlash1",
 				password: "flash123",
 			});
