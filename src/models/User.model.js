@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import validator_pkg from "validator";
 import Role from "../constants/roles.json" assert { type: "json" };
 import newID from "../utils/snowflake.js";
+import { toUTCDate } from "../utils/utc.js";
 
 const schema = new mongoose.Schema(
 	{
@@ -67,7 +68,7 @@ const schema = new mongoose.Schema(
 			required: true,
 			validate: {
 				validator: (date) => {
-					const maxDate = new Date();
+					const maxDate = toUTCDate(new Date());
 					maxDate.setFullYear(maxDate.getFullYear() - 13);
 					return date <= maxDate;
 				},
