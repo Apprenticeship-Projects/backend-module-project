@@ -14,6 +14,7 @@ export default async function seed(close = true) {
 
 	for (let user of users) {
 		user.password = await bcrypt.hash(user.password, SALT_ROUNDS);
+		user.dob = new Date(user.dob);
 	}
 
 	await User.insertMany(users);
