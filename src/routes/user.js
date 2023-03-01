@@ -4,6 +4,7 @@ import { auth, permissionLevel } from "../middleware/auth.js";
 import Role from "../constants/roles.json" assert { type: "json" };
 import { User } from "../models/index.js";
 import { createHash } from "../utils/hash.js";
+import { toUTCDate } from "../utils/utc.js";
 
 const router = Router();
 

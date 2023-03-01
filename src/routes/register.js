@@ -3,6 +3,7 @@ import { body, validationResult } from "express-validator";
 import { checkErrors } from "../middleware/validation.js";
 import User from "../models/User.model.js";
 import { createHash } from "../utils/hash.js";
+import { toUTCDate } from "../utils/utc.js";
 
 const router = Router();
 
