@@ -73,7 +73,7 @@ router.put("/",
             res.status(401).send("not authorized");
           }
           
-          foundUser.password = req.body.newPassword;
+          foundUser.password = hashedPass;
         }
       }
 
