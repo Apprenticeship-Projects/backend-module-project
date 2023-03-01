@@ -4,10 +4,10 @@ export function toUTCDate(date) {
 			date.getFullYear(),
 			date.getMonth(),
 			date.getDate(),
-			date.getHours(),
-			date.getMinutes(),
-			date.getSeconds(),
-			date.getMilliseconds()
+			0,
+			0,
+			0,
+			0
 		)
 	);
 }

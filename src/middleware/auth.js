@@ -2,6 +2,7 @@ import Role from "../constants/roles.json" assert { type: "json" };
 import { COOKIE } from "../constants/cookie.js";
 import { User } from "../models/index.js";
 import { verifyToken } from "../utils/token.js";
+import mongoose from "mongoose";
 
 // Specify required permission level for a route, set to User level (0) as default.
 function permissionLevel(requiredPermissionLevel = Role.USER) {
@@ -20,13 +21,13 @@ function permissionLevel(requiredPermissionLevel = Role.USER) {
       }
     } else {
       // User not found.
-      res.sendStatus(404);
+      res.sendStatus(401);
     }
   };
 }
 
 async function auth(req, res, next) {
-  const token = req.cookies["token"];
+  const token = req.cookies[COOKIE];
 
   if (!token) {
     return next();
@@ -34,13 +35,15 @@ async function auth(req, res, next) {
 
   const { uid, ses } = verifyToken(token);
 
-  const user = uid ? await User.findOne({ _id: uid }) : null;
+  if (mongoose.Types.ObjectId.isValid(uid)) {
+    const user = uid ? await User.findOne({_id: uid}).exec() : null;
 
-  if (!user || !user.sessions.includes(ses)) {
-    res.clearCookie(COOKIE);
-  } else {
-    req.user = user;
-    req.uid = uid;
+    if (!user || !user.sessions.includes(ses)) {
+      res.clearCookie(COOKIE);
+    } else {
+      req.user = user;
+      req.uid = uid;
+    }
   }
   next();
 }

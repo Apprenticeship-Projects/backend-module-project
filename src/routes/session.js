@@ -4,6 +4,7 @@ import { User } from "../models/index.js";
 import { signToken } from "../utils/token.js";
 import { body } from "express-validator";
 import { checkErrors } from "../middleware/validation.js";
+import {COOKIE} from "../constants/cookie.js";
 const router = Router();
 
 router.post(
@@ -30,7 +31,7 @@ router.post(
 			const sessionId = await user.createSession();
 			const token = signToken(user._id, sessionId);
 			res.status(200)
-				.cookie("token", token, { httpOnly: true, sameSite: "strict" })
+				.cookie(COOKIE, token, { httpOnly: true, sameSite: "strict" })
 				.send();
 			return;
 		}

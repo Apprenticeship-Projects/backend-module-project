@@ -27,7 +27,7 @@ router.get("/", auth, permissionLevel(Role.USER), (req, res) => {
   }
 });
 
-router.put("/", 
+router.put("/",
   body("newEmail").optional().isEmail().isLength({ min: 2, max: 32 }),
 	body("password")
 		.optional()
@@ -46,8 +46,8 @@ router.put("/",
 	body("newDob")
 		.optional()
 		.matches(/\d\d\d\d\/\d\d\/\d\d/),
-  auth, 
-  permissionLevel(Role.USER), 
+  auth,
+  permissionLevel(Role.USER),
   async (req, res) => {
     if (req.user) { //if auth has been passed, user details will be attached to the request
       const { username, email, firstName, lastName, dob } = req.user;
@@ -78,7 +78,7 @@ router.put("/",
             res.status(401).send("not authorized");
             return;
           }
-          
+
           foundUser.password = hashedPass;
         }
       }
@@ -86,7 +86,15 @@ router.put("/",
       // Save the updated user and return the new object
       await foundUser.save();
 
-      res.status(200).send(foundUser);
+      res.status(200).send({
+          username: foundUser.username,
+          email: foundUser.email,
+          firstName: foundUser.firstName,
+          lastName: foundUser.lastName,
+          dob: foundUser.dob,
+          ratings: foundUser.ratings.length,
+          tunes: foundUser.tunes.length
+      });
     } else {
       res.status(401).send("not authorized");
     }
