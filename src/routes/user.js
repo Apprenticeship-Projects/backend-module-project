@@ -63,7 +63,7 @@ router.put("/",
       foundUser.email = req.body.newEmail ? req.body.newEmail : email;
       foundUser.firstName = req.body.newFirstName ? req.body.newFirstName : firstName;
       foundUser.lastName = req.body.newLastName ? req.body.newLastName : lastName;
-      foundUser.dob = req.body.newDob ? req.body.newDob : dob;
+      foundUser.dob = req.body.newDob ? toUTCDate(new Date(req.body.newDob)) : dob;
 
       // Special case: Only update password if user has given their old password
       if(req.body.newPassword){

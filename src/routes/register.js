@@ -36,7 +36,7 @@ router.post(
 				lastName: req.body.lastName,
 				password: hashedPass,
 				email: req.body.email,
-				dob: Date.parse(req.body.dob),
+				dob: toUTCDate(new Date(req.body.dob)),
 			});
 
 			res.send("registered");
