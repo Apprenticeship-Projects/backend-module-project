@@ -53,7 +53,10 @@ router.put("/",
 
       const foundUser = await User.findOne({ _id: req.uid }); //find the user to update
 
-      if(!foundUser) res.status(404).send("User not found");
+      if(!foundUser) {
+        res.status(404).send("User not found");
+        return;
+      }
 
       // All update values are optional in the body, only update if they exist
       foundUser.username = req.body.newUsername ? req.body.newUsername : username;
@@ -66,11 +69,13 @@ router.put("/",
       if(req.body.newPassword){
         if(!req.body.password){
           res.status(401).send("not authorized");
+          return;
         }else{
           const hashedPass = await createHash(req.body.password);
 
           if(foundUser.password !== hashedPass){
             res.status(401).send("not authorized");
+            return;
           }
           
           foundUser.password = hashedPass;
