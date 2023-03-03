@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body, param, query } from "express-validator";
-import mongoose from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import { auth, permissionLevel } from "../middleware/auth.js";
 import { checkErrors } from "../middleware/validation.js";
 import Role from "../constants/roles.json" assert { type: "json" };
@@ -133,14 +133,8 @@ router.get(
 router.get(
 	"/:id",
 	param("id").custom((value) => {
-		// https://stackoverflow.com/a/29231016
-		let valid;
-		try {
-			valid = new mongoose.Types.ObjectId(value).toString() == value;
-		} catch (e) {
-			valid = false;
-		}
-		if (!valid) {
+		// https://stackoverflow.com/a/29231016 > https://stackoverflow.com/a/61779949
+		if (!isValidObjectId(value)) {
 			throw new Error(`${value} is not a valid id`);
 		}
 		return true;
@@ -227,14 +221,8 @@ router.post(
 router.put(
 	"/:id",
 	param("id").custom((value) => {
-		// https://stackoverflow.com/a/29231016
-		let valid;
-		try {
-			valid = new mongoose.Types.ObjectId(value).toString() == value;
-		} catch (e) {
-			valid = false;
-		}
-		if (!valid) {
+		// https://stackoverflow.com/a/29231016 > https://stackoverflow.com/a/61779949
+		if (!isValidObjectId(value)) {
 			throw new Error(`${value} is not a valid id`);
 		}
 		return true;
@@ -308,14 +296,8 @@ router.put(
 router.post(
 	"/:id/rate",
 	param("id").custom((value) => {
-		// https://stackoverflow.com/a/29231016
-		let valid;
-		try {
-			valid = new mongoose.Types.ObjectId(value).toString() == value;
-		} catch (e) {
-			valid = false;
-		}
-		if (!valid) {
+		// https://stackoverflow.com/a/29231016 > https://stackoverflow.com/a/61779949
+		if (!isValidObjectId(value)) {
 			throw new Error(`${value} is not a valid id`);
 		}
 		return true;
@@ -374,14 +356,8 @@ router.post(
 router.delete(
 	"/:id",
 	param("id").custom((value) => {
-		// https://stackoverflow.com/a/29231016
-		let valid;
-		try {
-			valid = new mongoose.Types.ObjectId(value).toString() == value;
-		} catch (e) {
-			valid = false;
-		}
-		if (!valid) {
+		// https://stackoverflow.com/a/29231016 > https://stackoverflow.com/a/61779949
+		if (!isValidObjectId(value)) {
 			throw new Error(`${value} is not a valid id`);
 		}
 		return true;
