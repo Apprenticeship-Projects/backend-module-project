@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import GENRES from "../constants/genres.json" assert { type: "json" };
-import TAGS from "../constants/tags.json" assert { type: "json" };
 
 const schema = new mongoose.Schema(
 	{
@@ -32,7 +31,6 @@ const schema = new mongoose.Schema(
 					type: String,
 					trim: true,
 					uppercase: true,
-					enum: TAGS.concat(GENRES),
 				},
 			],
 			default: [],
