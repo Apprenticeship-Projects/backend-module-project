@@ -54,11 +54,6 @@ router.put(
       try {
         const foundUser = await User.findOne({ _id: req.query.id }).exec(); //find the user to update
 
-        if (!foundUser) {
-          res.status(404).send("User not found");
-          return;
-        }
-
         // All update values are optional in the body, only update if they exist
         foundUser.username = req.body.newUsername
           ? req.body.newUsername
@@ -88,8 +83,6 @@ router.put(
           ratings: foundUser.ratings.length,
           tunes: foundUser.tunes.length,
         });
-
-        res.status(200).send(user);
       } catch (error) {
         res.send(404).send(error);
       }
