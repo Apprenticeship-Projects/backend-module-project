@@ -1,10 +1,11 @@
 import express from "express";
 import cors from "cors";
 import {
-	userRouter,
-	tuneRouter,
-	sessionRouter,
-	registerRouter,
+  userRouter,
+  tuneRouter,
+  sessionRouter,
+  registerRouter,
+  adminRouter,
 } from "./routes/index.js";
 import cookieParser from "cookie-parser";
 
@@ -18,5 +19,6 @@ app.use("/user", userRouter);
 app.use("/tune", tuneRouter);
 app.use("/session", sessionRouter);
 app.use("/register", registerRouter);
+app.use("/admin", adminRouter);
 
 export { app };
