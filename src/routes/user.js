@@ -8,8 +8,9 @@ import { toUTCDate } from "../utils/utc.js";
 
 const router = Router();
 
+router.use(auth, permissionLevel(Role.USER));
 // Routes for /user
-router.get("/", auth, permissionLevel(Role.USER), (req, res) => {
+router.get("/", (req, res) => {
   if (req.user) {
     const { username, email, firstName, lastName, dob, ratings, tunes } =
       req.user;
@@ -46,8 +47,6 @@ router.put(
   body("newDob")
     .optional()
     .matches(/\d\d\d\d\/\d\d\/\d\d/),
-  auth,
-  permissionLevel(Role.USER),
   async (req, res) => {
     if (req.user) {
       //if auth has been passed, user details will be attached to the request
@@ -110,7 +109,7 @@ router.put(
   }
 );
 
-router.delete("/", auth, permissionLevel(Role.USER), async (req, res) => {
+router.delete("/", async (req, res) => {
   if (req.user) {
     const dbResult = await User.deleteOne({ _id: req.uid }).exec();
     res.status(202).send("deleted");
