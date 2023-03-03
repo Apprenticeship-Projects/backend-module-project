@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { body, param, query } from "express-validator";
 import mongoose from "mongoose";
-import { auth, permissionLevel } from "../middleware/auth";
-import { checkErrors } from "../middleware/validation";
+import { auth, permissionLevel } from "../middleware/auth.js";
+import { checkErrors } from "../middleware/validation.js";
 import Role from "../constants/roles.json" assert { type: "json" };
 import GENRES from "../constants/genres.json" assert { type: "json" };
-import { Tune } from "../models";
+import { Tune, Rating } from "../models/index.js";
 import escapeStringRegexp from "escape-string-regexp";
 
 const router = Router();
@@ -61,12 +61,7 @@ router.get(
 			min: 0,
 		})
 		.toInt(),
-	query("user")
-		.optional()
-		.isBoolean({
-			strict: true,
-		})
-		.toBoolean(true),
+	query("user").optional().isBoolean().toBoolean(),
 	query("genres").optional().isArray().toArray(),
 	query("genres.*")
 		.isString()
@@ -99,7 +94,7 @@ router.get(
 
 		if (req.query.user) {
 			tunesQuery.where("owner").equals(req.user._id);
-		} else {
+		} else if (req.user.role < Role.ADMIN) {
 			tunesQuery.where("private").equals(false);
 		}
 
@@ -139,7 +134,12 @@ router.get(
 	"/:id",
 	param("id").custom((value) => {
 		// https://stackoverflow.com/a/29231016
-		const valid = new mongoose.Types.ObjectId(value).toString() == value;
+		let valid;
+		try {
+			valid = new mongoose.Types.ObjectId(value).toString() == value;
+		} catch (e) {
+			valid = false;
+		}
 		if (!valid) {
 			throw new Error(`${value} is not a valid id`);
 		}
@@ -158,7 +158,7 @@ router.get(
 
 		if (
 			tune.private &&
-			tune.owner._id != req.user._id &&
+			!tune.owner?._id.equals(req.user._id) &&
 			req.user.role < Role.ADMIN
 		) {
 			return res.sendStatus(403);
@@ -228,7 +228,12 @@ router.put(
 	"/:id",
 	param("id").custom((value) => {
 		// https://stackoverflow.com/a/29231016
-		const valid = new mongoose.Types.ObjectId(value).toString() == value;
+		let valid;
+		try {
+			valid = new mongoose.Types.ObjectId(value).toString() == value;
+		} catch (e) {
+			valid = false;
+		}
 		if (!valid) {
 			throw new Error(`${value} is not a valid id`);
 		}
@@ -277,7 +282,10 @@ router.put(
 			return res.sendStatus(404);
 		}
 
-		if (tune.owner._id != req.user._id && req.user.role < Role.ADMIN) {
+		if (
+			!tune.owner?._id.equals(req.user._id) &&
+			req.user.role < Role.ADMIN
+		) {
 			return res.sendStatus(403);
 		}
 
@@ -301,7 +309,12 @@ router.post(
 	"/:id/rate",
 	param("id").custom((value) => {
 		// https://stackoverflow.com/a/29231016
-		const valid = new mongoose.Types.ObjectId(value).toString() == value;
+		let valid;
+		try {
+			valid = new mongoose.Types.ObjectId(value).toString() == value;
+		} catch (e) {
+			valid = false;
+		}
 		if (!valid) {
 			throw new Error(`${value} is not a valid id`);
 		}
@@ -328,7 +341,7 @@ router.post(
 
 		let existingRating;
 		for (const rating of tune.ratings) {
-			if (rating.user._id == req.user._id) {
+			if (rating.user?._id.equals(req.user._id)) {
 				existingRating = rating;
 				break;
 			}
@@ -340,15 +353,21 @@ router.post(
 				tune: tune._id,
 			});
 
-			tune.ratings.push(existingRating);
+			tune.ratings.push(existingRating._id);
 		}
 
-		existingRating.value = req.body.value;
+		// const ratingToUpdate = await Rating.findById(existingRating._id)
 
+		existingRating.value = req.body.value;
 		await existingRating.save();
+
 		await tune.save();
 
-		res.send(calculateAverageRating(tune.ratings));
+		const updatedTune = await tune.populate("ratings");
+
+		res.send({
+			rating: calculateAverageRating(updatedTune.ratings),
+		});
 	}
 );
 
@@ -356,7 +375,12 @@ router.delete(
 	"/:id",
 	param("id").custom((value) => {
 		// https://stackoverflow.com/a/29231016
-		const valid = new mongoose.Types.ObjectId(value).toString() == value;
+		let valid;
+		try {
+			valid = new mongoose.Types.ObjectId(value).toString() == value;
+		} catch (e) {
+			valid = false;
+		}
 		if (!valid) {
 			throw new Error(`${value} is not a valid id`);
 		}
@@ -364,14 +388,26 @@ router.delete(
 	}),
 	checkErrors,
 	async (req, res) => {
-		const tune = await Tune.findById(req.params.id).exec();
+		const tune = await Tune.findById(req.params.id)
+			.populate("owner")
+			.exec();
 
 		if (!tune) {
 			return res.sendStatus(404);
 		}
 
-		if (tune.owner._id != req.user._id && req.user.role < Role.ADMIN) {
+		if (
+			!tune.owner?._id.equals(req.user._id) &&
+			req.user.role < Role.ADMIN
+		) {
 			return res.sendStatus(403);
+		}
+
+		if (tune.owner) {
+			tune.owner.tunes = tune.owner.tunes.filter(
+				(id) => !id.equals(tune._id)
+			);
+			await tune.owner.save();
 		}
 
 		await tune.delete();

@@ -26,7 +26,9 @@ beforeEach(async () => {
 	testUserToken = signToken(testUser._id, sessionId);
 
 	testTune = await Tune.findOne({ title: "Announcement" }).exec();
-	testUser.tunes.push(testTune);
+	testTune.owner = testUser._id;
+	testUser.tunes.push(testTune._id);
+	await testTune.save();
 	await testUser.save();
 
 	testTune2 = await Tune.findOne({
@@ -101,13 +103,14 @@ describe("GET /tune", () => {
 	});
 
 	test("'user' query should only return the user's tunes", async () => {
-		const { body } = await request(app)
+		const { body, statusCode } = await request(app)
 			.get("/tune")
 			.query({
 				user: true,
 			})
 			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
 
+		expect(statusCode).toBe(200);
 		expect(body.length).toBe(1);
 		expect(body[0].title).toBe("Announcement");
 	});
@@ -138,12 +141,20 @@ describe("GET /tune/:id", () => {
 		);
 	});
 
-	test("should return 400 status for invalid id", async () => {
+	test("should return 400 status code for an invalid id", async () => {
 		const { statusCode } = await request(app)
 			.get("/tune/1234")
 			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
 
 		expect(statusCode).toBe(400);
+	});
+
+	test("should return 404 status code if tune does not exist", async () => {
+		const { statusCode } = await request(app)
+			.get("/tune/617361736461736461616161")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
+
+		expect(statusCode).toBe(404);
 	});
 });
 
@@ -239,14 +250,15 @@ describe("POST /tune", () => {
 });
 
 describe("PUT /tune/:id", () => {
-	test("should return the updated entry", async () => {
-		const { body } = await request(app)
+	test("should return 200 status code and the updated entry", async () => {
+		const { body, statusCode } = await request(app)
 			.put("/tune/" + testTune._id)
 			.set("Cookie", [`${COOKIE}=${testUserToken}`])
 			.send({
 				private: true,
 			});
 
+		expect(statusCode).toBe(200);
 		expect(body.private).toBeTruthy();
 	});
 
@@ -260,6 +272,22 @@ describe("PUT /tune/:id", () => {
 
 		expect(statusCode).toBe(400);
 	});
+
+	test("should return 400 status code for an invalid id", async () => {
+		const { statusCode } = await request(app)
+			.put("/tune/1234")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
+
+		expect(statusCode).toBe(400);
+	});
+
+	test("should return 404 status code if tune does not exist", async () => {
+		const { statusCode } = await request(app)
+			.put("/tune/617361736461736461616161")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
+
+		expect(statusCode).toBe(404);
+	});
 });
 
 describe("DELETE /tune/:id", () => {
@@ -271,9 +299,17 @@ describe("DELETE /tune/:id", () => {
 		expect(statusCode).toBe(200);
 	});
 
-	test("should return 404 status code if tune does not exist", async () => {
+	test("should return 400 status code for an invalid id", async () => {
 		const { statusCode } = await request(app)
 			.delete("/tune/1234")
+			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
+
+		expect(statusCode).toBe(400);
+	});
+
+	test("should return 404 status code if tune does not exist", async () => {
+		const { statusCode } = await request(app)
+			.delete("/tune/617361736461736461616161")
 			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
 
 		expect(statusCode).toBe(404);
@@ -297,17 +333,20 @@ describe("POST /tune/:id/rate", () => {
 				value: 5,
 			});
 
-		expect(body).toBe(5);
+		expect(body.rating).toBe(5);
 	});
 
 	test("should return an average of all ratings", async () => {
 		let rating = new Rating({
+			// user: testUser._id,
 			tune: testTune._id,
 			value: 1,
 		});
 		rating.save();
 		testTune.ratings.push(rating);
 		testTune.save();
+		testUser.ratings.push(rating);
+		testUser.save();
 
 		const { body } = await request(app)
 			.post("/tune/" + testTune._id + "/rate")
@@ -316,7 +355,7 @@ describe("POST /tune/:id/rate", () => {
 				value: 5,
 			});
 
-		expect(body).toBe(3);
+		expect(body.rating).toBe(3);
 	});
 
 	test("should return a 400 status code if value is invalid", async () => {
