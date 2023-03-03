@@ -10,10 +10,10 @@ const router = Router();
 router.use(auth, permissionLevel(Role.ADMIN));
 
 // Routes for /admin
-router.get("/users", (req, res) => {
+router.get("/users", async (req, res) => {
   if (req.user) {
     try {
-      const allUsers = User.find().exec();
+      const allUsers = await User.find().exec();
       res.status(200).send(allUsers);
     } catch (error) {
       res.send(404).send(error);
@@ -23,13 +23,16 @@ router.get("/users", (req, res) => {
   }
 });
 
-router.get("/users/:id", (req, res) => {
-  if (req.user) {
+router.get("/users/:username", async (req, res) => {
+  if (req.user && req.params) {
     try {
-      const user = User.findOne({ _id: req.query.id }).exec();
+      const user = await User.findOne({ username: req.params.username }).exec();
+
+      if (!user) return res.status(404).send("no user found");
+
       res.status(200).send(user);
     } catch (error) {
-      res.send(404).send(error);
+      res.status(404).send(error);
     }
   } else {
     res.status(401).send("not authorized");
@@ -37,7 +40,7 @@ router.get("/users/:id", (req, res) => {
 });
 
 router.put(
-  "/users/:id",
+  "/users/:username",
   body("newEmail").optional().isEmail().isLength({ min: 2, max: 32 }),
   body("newUsername")
     .optional()
@@ -52,8 +55,14 @@ router.put(
   async (req, res) => {
     if (req.user) {
       try {
-        const foundUser = await User.findOne({ _id: req.query.id }).exec(); //find the user to update
+        const foundUser = await User.findOne({
+          username: req.params.username,
+        }).exec(); //find the user to update
 
+        if (!foundUser) {
+          res.status(404).send("User not found");
+          return;
+        }
         // All update values are optional in the body, only update if they exist
         foundUser.username = req.body.newUsername
           ? req.body.newUsername
@@ -69,7 +78,7 @@ router.put(
           : foundUser.lastName;
         foundUser.dob = req.body.newDob
           ? toUTCDate(new Date(req.body.newDob))
-          : dob;
+          : foundUser.dob;
 
         // Save the updated user and return the new object
         await foundUser.save();
@@ -84,7 +93,7 @@ router.put(
           tunes: foundUser.tunes.length,
         });
       } catch (error) {
-        res.send(404).send(error);
+        res.sendStatus(404);
       }
     } else {
       res.status(401).send("not authorized");
@@ -92,10 +101,10 @@ router.put(
   }
 );
 
-router.delete("/users/:id", async (req, res) => {
+router.delete("/users/:username", async (req, res) => {
   if (req.user) {
     try {
-      await User.deleteOne({ _id: req.query.id }).exec();
+      await User.deleteOne({ username: req.params.username }).exec();
       res.status(202).send("deleted");
     } catch (error) {
       res.send(404).send(error);
