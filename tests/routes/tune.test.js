@@ -64,12 +64,15 @@ describe("GET /tune", () => {
 		expect(Object.keys(body[0])).toEqual(
 			expect.arrayContaining([
 				"_id",
-				"title",
 				"owner",
+				"private",
+				"title",
 				"genre",
 				"tags",
-				"bpm",
 				"rating", // Rating should be calculated before being sent to client
+				"bpm",
+				"createdAt",
+				"updatedAt",
 			])
 		);
 	});
@@ -120,24 +123,27 @@ describe("GET /tune/:id", () => {
 		expect(Object.keys(body)).toEqual(
 			expect.arrayContaining([
 				"_id",
-				"title",
 				"owner",
+				"private",
+				"title",
 				"genre",
 				"tags",
-				"bpm",
 				"rating", // Rating should be calculated before being sent to client
+				"bpm",
+				"createdAt",
+				"updatedAt",
 				"tempo",
 				"tracks",
 			])
 		);
 	});
 
-	test("should return 404 status for invalid id", async () => {
+	test("should return 400 status for invalid id", async () => {
 		const { statusCode } = await request(app)
 			.get("/tune/1234")
 			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
 
-		expect(statusCode).toBe(404);
+		expect(statusCode).toBe(400);
 	});
 });
 
@@ -218,7 +224,7 @@ describe("POST /tune", () => {
 				private: true,
 				title: "Tune title",
 				genre: "NONE",
-				tags: ["NOT_A_TAG"],
+				tags: [123],
 				tempo: "8n",
 				tracks: [
 					{
@@ -235,7 +241,7 @@ describe("POST /tune", () => {
 describe("PUT /tune/:id", () => {
 	test("should return the updated entry", async () => {
 		const { body } = await request(app)
-			.post("/tune/" + testTune._id)
+			.put("/tune/" + testTune._id)
 			.set("Cookie", [`${COOKIE}=${testUserToken}`])
 			.send({
 				private: true,
@@ -246,7 +252,7 @@ describe("PUT /tune/:id", () => {
 
 	test("should return 400 for a bad value", async () => {
 		const { statusCode } = await request(app)
-			.post("/tune/" + testTune._id)
+			.put("/tune/" + testTune._id)
 			.set("Cookie", [`${COOKIE}=${testUserToken}`])
 			.send({
 				title: "Hi",
@@ -265,12 +271,12 @@ describe("DELETE /tune/:id", () => {
 		expect(statusCode).toBe(200);
 	});
 
-	test("should return 400 status code if tune does not exist", async () => {
+	test("should return 404 status code if tune does not exist", async () => {
 		const { statusCode } = await request(app)
 			.delete("/tune/1234")
 			.set("Cookie", [`${COOKIE}=${testUserToken}`]);
 
-		expect(statusCode).toBe(400);
+		expect(statusCode).toBe(404);
 	});
 
 	test("should return 403 status code if user does not have permission to delete", async () => {
@@ -285,7 +291,7 @@ describe("DELETE /tune/:id", () => {
 describe("POST /tune/:id/rate", () => {
 	test("should return an updated rating number", async () => {
 		const { body } = await request(app)
-			.delete("/tune/" + testTune._id + "/rate")
+			.post("/tune/" + testTune._id + "/rate")
 			.set("Cookie", [`${COOKIE}=${testUserToken}`])
 			.send({
 				value: 5,
@@ -304,7 +310,7 @@ describe("POST /tune/:id/rate", () => {
 		testTune.save();
 
 		const { body } = await request(app)
-			.delete("/tune/" + testTune._id + "/rate")
+			.post("/tune/" + testTune._id + "/rate")
 			.set("Cookie", [`${COOKIE}=${testUserToken}`])
 			.send({
 				value: 5,
@@ -315,7 +321,7 @@ describe("POST /tune/:id/rate", () => {
 
 	test("should return a 400 status code if value is invalid", async () => {
 		const { statusCode } = await request(app)
-			.delete("/tune/" + testTune._id + "/rate")
+			.post("/tune/" + testTune._id + "/rate")
 			.set("Cookie", [`${COOKIE}=${testUserToken}`])
 			.send({
 				value: 0,
