@@ -27,54 +27,63 @@ router.get("/", auth, permissionLevel(Role.USER), (req, res) => {
   }
 });
 
-router.put("/",
+router.put(
+  "/",
   body("newEmail").optional().isEmail().isLength({ min: 2, max: 32 }),
-	body("password")
-		.optional()
-		.isLength({ min: 8, max: 20 })
-		.not().contains(" "),
+  body("password").optional().isLength({ min: 8, max: 20 }).not().contains(" "),
   body("newPassword")
-		.optional()
-		.isLength({ min: 8, max: 20 })
-		.not().contains(" "),
-	body("newUsername")
-		.optional()
-		.isLength({ min: 5 })
-		.not().matches(/[^a-zA-Z0-9_]/),
-	body("newFirstName").optional().isAlpha().isLength({ min: 1 }),
-	body("newLastName").optional().isAlpha().isLength({ min: 1 }),
-	body("newDob")
-		.optional()
-		.matches(/\d\d\d\d\/\d\d\/\d\d/),
+    .optional()
+    .isLength({ min: 8, max: 20 })
+    .not()
+    .contains(" "),
+  body("newUsername")
+    .optional()
+    .isLength({ min: 5 })
+    .not()
+    .matches(/[^a-zA-Z0-9_]/),
+  body("newFirstName").optional().isAlpha().isLength({ min: 1 }),
+  body("newLastName").optional().isAlpha().isLength({ min: 1 }),
+  body("newDob")
+    .optional()
+    .matches(/\d\d\d\d\/\d\d\/\d\d/),
   auth,
   permissionLevel(Role.USER),
   async (req, res) => {
-    if (req.user) { //if auth has been passed, user details will be attached to the request
+    if (req.user) {
+      //if auth has been passed, user details will be attached to the request
       const { username, email, firstName, lastName, dob } = req.user;
 
-      const foundUser = await User.findOne({ _id: req.uid }); //find the user to update
+      const foundUser = await User.findOne({ _id: req.uid }).exec(); //find the user to update
 
-      if(!foundUser) {
+      if (!foundUser) {
         res.status(404).send("User not found");
         return;
       }
 
       // All update values are optional in the body, only update if they exist
-      foundUser.username = req.body.newUsername ? req.body.newUsername : username;
+      foundUser.username = req.body.newUsername
+        ? req.body.newUsername
+        : username;
       foundUser.email = req.body.newEmail ? req.body.newEmail : email;
-      foundUser.firstName = req.body.newFirstName ? req.body.newFirstName : firstName;
-      foundUser.lastName = req.body.newLastName ? req.body.newLastName : lastName;
-      foundUser.dob = req.body.newDob ? toUTCDate(new Date(req.body.newDob)) : dob;
+      foundUser.firstName = req.body.newFirstName
+        ? req.body.newFirstName
+        : firstName;
+      foundUser.lastName = req.body.newLastName
+        ? req.body.newLastName
+        : lastName;
+      foundUser.dob = req.body.newDob
+        ? toUTCDate(new Date(req.body.newDob))
+        : dob;
 
       // Special case: Only update password if user has given their old password
-      if(req.body.newPassword){
-        if(!req.body.password){
+      if (req.body.newPassword) {
+        if (!req.body.password) {
           res.status(401).send("not authorized");
           return;
-        }else{
+        } else {
           const hashedPass = await createHash(req.body.password);
 
-          if(foundUser.password !== hashedPass){
+          if (foundUser.password !== hashedPass) {
             res.status(401).send("not authorized");
             return;
           }
@@ -87,28 +96,27 @@ router.put("/",
       await foundUser.save();
 
       res.status(200).send({
-          username: foundUser.username,
-          email: foundUser.email,
-          firstName: foundUser.firstName,
-          lastName: foundUser.lastName,
-          dob: foundUser.dob,
-          ratings: foundUser.ratings.length,
-          tunes: foundUser.tunes.length
+        username: foundUser.username,
+        email: foundUser.email,
+        firstName: foundUser.firstName,
+        lastName: foundUser.lastName,
+        dob: foundUser.dob,
+        ratings: foundUser.ratings.length,
+        tunes: foundUser.tunes.length,
       });
     } else {
       res.status(401).send("not authorized");
     }
-  });
+  }
+);
 
-  router.delete("/", auth, permissionLevel(Role.USER), async (req, res) => {
-    if (req.user) {
-      const dbResult = await User.deleteOne({ _id: req.uid });
-      console.log(test);
-
-      res.status(202).send("deleted");
-    } else {
-      res.status(401).send("not authorized");
-    }
+router.delete("/", auth, permissionLevel(Role.USER), async (req, res) => {
+  if (req.user) {
+    const dbResult = await User.deleteOne({ _id: req.uid }).exec();
+    res.status(202).send("deleted");
+  } else {
+    res.status(401).send("not authorized");
+  }
 });
 
 export { router };
