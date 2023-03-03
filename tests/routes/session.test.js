@@ -27,7 +27,7 @@ beforeEach(async () => {
 });
 
 describe("New session", () => {
-	it("Valid user", async () => {
+	test("Valid user", async () => {
 		const { statusCode, headers } = await request(app)
 			.post("/session")
 			.send({
@@ -42,7 +42,7 @@ describe("New session", () => {
 			new RegExp(`^${COOKIE}=[A-Za-z0-9._-]+; Path=\\/; HttpOnly; SameSite=Strict$`)
 		);
 	});
-	it("Invalid username", async () => {
+	test("Invalid username", async () => {
 		const { statusCode, headers } = await request(app)
 			.post("/session")
 			.send({
@@ -52,7 +52,7 @@ describe("New session", () => {
 		expect(statusCode).toBe(401);
 		expect(headers["set-cookie"]).toBeUndefined();
 	});
-	it("Invalid password", async () => {
+	test("Invalid password", async () => {
 		const { statusCode, headers } = await request(app)
 			.post("/session")
 			.send({
@@ -62,21 +62,21 @@ describe("New session", () => {
 		expect(statusCode).toBe(401);
 		expect(headers["set-cookie"]).toBeUndefined();
 	});
-	it("No data", async () => {
+	test("No data", async () => {
 		const { statusCode, headers } = await request(app)
 			.post("/session")
 			.send();
 		expect(statusCode).toBe(400);
 		expect(headers["set-cookie"]).toBeUndefined();
 	});
-	it("Empty JSON", async () => {
+	test("Empty JSON", async () => {
 		const { statusCode, headers } = await request(app)
 			.post("/session")
 			.send({});
 		expect(statusCode).toBe(400);
 		expect(headers["set-cookie"]).toBeUndefined();
 	});
-	it("Null values", async () => {
+	test("Null values", async () => {
 		const { statusCode, headers } = await request(app)
 			.post("/session")
 			.send({
@@ -86,7 +86,7 @@ describe("New session", () => {
 		expect(statusCode).toBe(400);
 		expect(headers["set-cookie"]).toBeUndefined();
 	});
-	it("Missing username", async () => {
+	test("Missing username", async () => {
 		const { statusCode, headers } = await request(app)
 			.post("/session")
 			.send({
@@ -96,7 +96,7 @@ describe("New session", () => {
 		expect(statusCode).toBe(400);
 		expect(headers["set-cookie"]).toBeUndefined();
 	});
-	it("Missing username", async () => {
+	test("Missing username", async () => {
 		const { statusCode, headers } = await request(app)
 			.post("/session")
 			.send({
@@ -109,7 +109,7 @@ describe("New session", () => {
 });
 
 describe("Delete session", () => {
-	it("Delete a valid session", async () => {
+	test("Delete a valid session", async () => {
 		const { statusCode, headers } = await request(app)
 			.delete("/session")
 			.set('Cookie', [`${COOKIE}=${testUserToken}`])
@@ -122,7 +122,7 @@ describe("Delete session", () => {
 			new RegExp(`^${COOKIE}=; Path=\\/; Expires=Thu, 01 Jan 1970 00:00:00 GMT$`)
 		);
 	});
-	it("Delete an already deleted session", async () => {
+	test("Delete an already deleted session", async () => {
 		await request(app)
 			.delete("/session")
 			.set('Cookie', [`${COOKIE}=${testUserToken}`])
@@ -133,7 +133,7 @@ describe("Delete session", () => {
 			.send();
 		expect(statusCode).toBe(401);
 	});
-	it("Invalid session", async () => {
+	test("Invalid session", async () => {
 		const { statusCode, headers } = await request(app)
 			.delete("/session")
 			.set('Cookie', [`${COOKIE}=${wrongToken}`])
@@ -141,7 +141,7 @@ describe("Delete session", () => {
 		expect(statusCode).toBe(401);
 		expect(headers["set-cookie"]).toBeUndefined();
 	});
-	it("No token", async () => {
+	test("No token", async () => {
 		const { statusCode, headers } = await request(app)
 			.delete("/session")
 			.send();
