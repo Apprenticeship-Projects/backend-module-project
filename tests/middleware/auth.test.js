@@ -22,8 +22,8 @@ describe('Test permissionLevel middleware', () => {
         app.get('/', (req, res, next) => {
             req.user = req.body.user;
             next();
-        }, 
-        middlewareFunction, 
+        },
+        middlewareFunction,
         async (req, res) => {
             res.sendStatus(200);
         });
@@ -35,7 +35,7 @@ describe('Test permissionLevel middleware', () => {
 				});
 			expect(statusCode).toBe(200);
     })
-    
+
     test("401 status returned when user level is less than  required permission level", async () => {
 
         const middlewareFunction = permissionLevel(Role.ADMIN);
@@ -43,7 +43,7 @@ describe('Test permissionLevel middleware', () => {
         app.get('/test2', (req, res, next) => {
             req.user = req.body.user;
             next();
-        }, 
+        },
         middlewareFunction, async (req, res) => {
             res.sendStatus(200);
         });
@@ -56,16 +56,16 @@ describe('Test permissionLevel middleware', () => {
 			expect(statusCode).toBe(401);
     })
 
-    test("404 status returned when no user found", async () => {
+    test("401 status returned when no user found", async () => {
 
         const middlewareFunction = permissionLevel(Role.ADMIN);
 
-        app.get('/', 
+        app.get('/',
             (req, res, next) => {
                 req.user = req.body.user;
                 next();
-            }, 
-            middlewareFunction, 
+            },
+            middlewareFunction,
             async (req, res) => {
                 res.sendStatus(200);
             });
@@ -73,7 +73,7 @@ describe('Test permissionLevel middleware', () => {
         const { statusCode } = await request(app)
 				.get("/")
 				.send({someRandomThing:0});
-			expect(statusCode).toBe(404);
+			expect(statusCode).toBe(401);
     })
 })
 
@@ -87,17 +87,17 @@ describe("Test the auth middleware function", () => {
 
 
     test("auth function lets us pass if session and user match", async () => {
-    
+
         const testUser = await User.findOne().exec();
-    
+
         if (!testUser) throw new Error("Test user not found in db");
-    
+
         const sessionId = await testUser.createSession();
         const testUserToken = signToken(testUser._id, sessionId);
         await testUser.save();
 
         app.get('/test3',
-        auth, 
+        auth,
         async (req, res) => {
             res.sendStatus(200);
         });
