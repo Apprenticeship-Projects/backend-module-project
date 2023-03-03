@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { verifyHash } from "../utils/hash.js";
 import { User } from "../models/index.js";
-import { signToken } from "../utils/token.js";
+import {signToken, verifyToken} from "../utils/token.js";
 import { body } from "express-validator";
 import { checkErrors } from "../middleware/validation.js";
 import {COOKIE} from "../constants/cookie.js";
+import {auth} from "../middleware/auth.js";
 const router = Router();
 
 router.post(
@@ -38,5 +39,19 @@ router.post(
 		res.sendStatus(401);
 	}
 );
+
+router.delete("/", auth, checkErrors, async (req, res) => {
+	if (req.user != null) {
+		const token = verifyToken(req.cookies[COOKIE]);
+		const removed = await req.user.removeSession(token.ses);
+		if (removed) {
+			res.status(200).clearCookie(COOKIE).send();
+		} else {
+			res.sendStatus(400);
+		}
+		return;
+	}
+	res.sendStatus(401);
+});
 
 export { router };
