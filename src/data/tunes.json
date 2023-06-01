@@ -1,0 +1,59 @@
+[
+    {
+        "private": false,
+        "title": "Announcement",
+        "tempo": "4n",
+        "tracks": [
+            {
+                "type": "SYNTH",
+                "notes": [
+                    [
+                        "C4",
+                        "8n"
+                    ],
+                    [
+                        "E4",
+                        "8n"
+                    ],
+                    [
+                        "G4",
+                        "8n"
+                    ]
+                ]
+            }
+        ]
+    },
+    {
+        "private": false,
+        "title": "Random Tune 1",
+        "tempo": "4n",
+        "tracks": [
+            {
+                "type": "SYNTH",
+                "notes": []
+            }
+        ]
+    },
+    {
+        "private": false,
+        "title": "Random Tune 2",
+        "tempo": "4n",
+        "tracks": [
+            {
+                "type": "SYNTH",
+                "notes": []
+            }
+        ]
+    },
+    {
+        "private": false,
+        "title": "Random Tune 3",
+        "tempo": "4n",
+        "tracks": [
+            {
+                "type": "SYNTH",
+                "notes": []
+            }
+        ]
+    }
+]
